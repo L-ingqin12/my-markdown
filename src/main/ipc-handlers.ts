@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, dialog, app } from 'electron'
+import { ipcMain, BrowserWindow } from 'electron'
 import { IPC } from '../shared/ipc-channels'
 import { openFileDialog, saveFile, saveFileAsDialog, readFileByPath, getRecentFiles } from './file-manager'
 import { getPreferences, setPreferences, getTheme, setTheme } from './preferences'
@@ -7,6 +7,17 @@ import { getThemeList, loadThemeCss, getCurrentTheme } from './theme-manager'
 import { writeFile, mkdir } from 'fs/promises'
 import { join, dirname } from 'path'
 import { app as electronApp } from 'electron'
+import { recentFilesStore } from './store'
+import { exportHtml } from './export'
+import { exportPdf } from './export'
+import { exportFeishu } from './export-feishu'
+import { exportDoc } from './export-doc'
+import {
+  getGitStatus, gitCommit, gitCommitAll, gitPush,
+  gitPull, gitLog, gitInit, gitDiff
+} from './git-manager'
+import { ClaudeManager } from './claude-manager'
+import { ConversationQueue } from './conversation-queue'
 
 export function registerIpcHandlers(): void {
   // File operations
@@ -31,7 +42,6 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IPC.FILE_ADD_RECENT, async (_e, filePath: string) => {
-    const { recentFilesStore } = require('./store')
     recentFilesStore.addRecent(filePath)
   })
 
@@ -41,19 +51,15 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IPC.IMAGE_UPLOAD_ALL, async (_e, content: string, basePath?: string) => {
-    // Parse markdown for local image references
     const localImgRegex = /!\[.*?\]\((?!https?:\/\/)(?!data:)([^)]+)\)/g
     const localPaths: string[] = []
     let match
     while ((match = localImgRegex.exec(content)) !== null) {
-      const imgPath = match[1]
-      // Resolve relative paths
-      const resolved = basePath ? join(dirname(basePath), imgPath) : imgPath
+      const resolved = basePath ? join(dirname(basePath), match[1]) : match[1]
       localPaths.push(resolved)
     }
     if (localPaths.length === 0) return []
-    const urls = await uploadImages(localPaths, basePath)
-    return urls
+    return uploadImages(localPaths, basePath)
   })
 
   ipcMain.handle(IPC.IMAGE_GET_CONFIG, async () => {
@@ -130,22 +136,18 @@ export function registerIpcHandlers(): void {
 
   // Export
   ipcMain.handle(IPC.EXPORT_HTML, async (_e, content: string, filePath?: string) => {
-    const { exportHtml } = require('./export')
     return exportHtml(content, filePath)
   })
 
   ipcMain.handle(IPC.EXPORT_PDF, async (_e, content: string, filePath?: string) => {
-    const { exportPdf } = require('./export')
     return exportPdf(content, filePath)
   })
 
   ipcMain.handle(IPC.EXPORT_FEISHU, async (_e, content: string, filePath?: string, title?: string) => {
-    const { exportFeishu } = require('./export-feishu')
     return exportFeishu(content, filePath, title)
   })
 
   ipcMain.handle(IPC.EXPORT_DOC, async (_e, content: string, filePath?: string, title?: string, themeCss?: string) => {
-    const { exportDoc } = require('./export-doc')
     const options: { title?: string; themeCss?: string } = {}
     if (title) options.title = title
     if (themeCss) options.themeCss = themeCss
@@ -153,7 +155,6 @@ export function registerIpcHandlers(): void {
   })
 
   // Git handlers
-  const { getGitStatus, gitCommit, gitCommitAll, gitPush, gitPull, gitLog, gitInit, gitDiff } = require('./git-manager')
   ipcMain.handle(IPC.GIT_STATUS, async (_e, filePath?: string) => getGitStatus(filePath))
   ipcMain.handle(IPC.GIT_COMMIT, async (_e, filePath: string, message: string) => gitCommit(filePath, message))
   ipcMain.handle(IPC.GIT_COMMIT_ALL, async (_e, repoPath: string, message: string) => gitCommitAll(repoPath, message))
@@ -164,8 +165,6 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IPC.GIT_DIFF, async (_e, filePath: string) => gitDiff(filePath))
 
   // Claude CLI handlers
-  const { ClaudeManager } = require('./claude-manager')
-  const { ConversationQueue } = require('./conversation-queue')
   const claudeManager = new ClaudeManager()
   const convQueue = new ConversationQueue(10)
 
