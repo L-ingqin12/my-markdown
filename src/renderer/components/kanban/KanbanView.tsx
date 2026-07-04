@@ -9,6 +9,7 @@ import {
   useSensors,
   type DragStartEvent,
   type DragEndEvent,
+  type DragOverEvent,
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 import { useEditor } from '../../contexts/EditorContext'
@@ -122,6 +123,7 @@ export function KanbanView() {
     updated.columns.push({
       id: uuidv4(),
       title: trimmed,
+      isComplete: false,
       cards: [],
     })
     saveBoard(updated)

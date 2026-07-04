@@ -393,22 +393,18 @@ export function matchesCondition(data: FrontmatterData, condition: QueryConditio
       return typeof fieldValue === 'number' && typeof condition.value === 'number' && fieldValue >= condition.value
     case '<=':
       return typeof fieldValue === 'number' && typeof condition.value === 'number' && fieldValue <= condition.value
-    case 'contains':
-      if (Array.isArray(fieldValue)) {
-        return fieldValue.includes(String(condition.value))
-      }
-      if (typeof fieldValue === 'string') {
-        return fieldValue.includes(String(condition.value))
-      }
+    case 'contains': {
+      const v = fieldValue as any
+      if (Array.isArray(v)) return v.includes(String(condition.value))
+      if (typeof v === 'string') return v.includes(String(condition.value))
       return false
-    case '!contains':
-      if (Array.isArray(fieldValue)) {
-        return !fieldValue.includes(String(condition.value))
-      }
-      if (typeof fieldValue === 'string') {
-        return !fieldValue.includes(String(condition.value))
-      }
+    }
+    case '!contains': {
+      const v = fieldValue as any
+      if (Array.isArray(v)) return !v.includes(String(condition.value))
+      if (typeof v === 'string') return !v.includes(String(condition.value))
       return true
+    }
     case 'between':
       if (Array.isArray(condition.value) && condition.value.length === 2) {
         const [min, max] = condition.value

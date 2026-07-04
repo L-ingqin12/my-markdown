@@ -10,7 +10,6 @@ import { useImageUpload } from './hooks/useImageUpload'
 import { PreferencesDialog } from './components/dialogs/PreferencesDialog'
 import { AboutDialog } from './components/dialogs/AboutDialog'
 import { UploadConfig } from './components/upload/UploadConfig'
-import { ChatProvider } from './contexts/ChatContext'
 
 function AppInner() {
   const ctx = useEditor()
@@ -41,10 +40,10 @@ function AppInner() {
         case 'edit:redo': ctx.editorRef.current?.redo(); break
         case 'edit:find': ctx.setShowSearch(true); break
         case 'edit:replace': ctx.setShowSearch(true); break
-        case 'view:toggle-sidebar': ctx.setSidebarVisible(v => !v); break
-        case 'view:toggle-source': ctx.setSourceMode(m => !m); break
-        case 'view:toggle-focus': ctx.setFocusMode(m => !m); break
-        case 'view:toggle-typewriter': ctx.setTypewriterMode(m => !m); break
+        case 'view:toggle-sidebar': ctx.setSidebarVisible(!ctx.sidebarVisible); break
+        case 'view:toggle-source': ctx.setSourceMode(!ctx.sourceMode); break
+        case 'view:toggle-focus': ctx.setFocusMode(!ctx.focusMode); break
+        case 'view:toggle-typewriter': ctx.setTypewriterMode(!ctx.typewriterMode); break
         case 'export:html': handleExportHtml(); break
         case 'export:pdf': handleExportPdf(); break
         case 'image:upload-all': uploadAllLocalImages(); break

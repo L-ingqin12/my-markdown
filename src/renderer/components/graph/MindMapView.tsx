@@ -20,9 +20,8 @@ export function MindMapView({ content }: MindMapViewProps) {
       if (!markmapRef.current) {
         markmapRef.current = Markmap.create(svgRef.current, {
           autoFit: true,
-          colorFreezeLevel: 3,
           duration: 300
-        })
+        } as any)
       }
 
       markmapRef.current.setData(root)

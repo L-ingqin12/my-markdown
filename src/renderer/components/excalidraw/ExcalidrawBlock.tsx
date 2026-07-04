@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react'
-import { Excalidraw, ExcalidrawImperativeAPI } from '@excalidraw/excalidraw'
+import { Excalidraw } from '@excalidraw/excalidraw'
 import { ExcalidrawScene } from '../../utils/excalidraw-parser'
 import { exportToBlob } from '@excalidraw/excalidraw'
 
@@ -11,7 +11,7 @@ interface ExcalidrawBlockProps {
 
 export function ExcalidrawBlock({ blockId, sceneData, onUpdate }: ExcalidrawBlockProps) {
   const [isEditing, setIsEditing] = useState(false)
-  const apiRef = useRef<ExcalidrawImperativeAPI | null>(null)
+  const apiRef = useRef<any>(null)
   const lastSavedRef = useRef<string>(JSON.stringify(sceneData))
 
   const handleSave = useCallback(() => {
