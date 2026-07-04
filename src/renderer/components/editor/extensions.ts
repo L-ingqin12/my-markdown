@@ -54,10 +54,6 @@ export function buildExtensions(
       extensions: GFM
     }),
 
-    // WYSIWYG (hides markdown syntax, shows rendered content)
-    wysiwygPlugin,
-    wysiwygTheme,
-
     // Syntax highlighting
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
 
@@ -82,12 +78,19 @@ export function buildExtensions(
         fontSize: `${preferences?.fontSize ?? 16}px`,
         backgroundColor: isDark ? '#282c34' : '#ffffff'
       },
+      '&.cm-editor': {
+        outline: 'none !important'
+      },
+      '&.cm-editor.cm-focused': {
+        outline: 'none !important'
+      },
       '.cm-scroller': {
         fontFamily: preferences?.fontFamily ?? "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif",
-        lineHeight: '1.8'
+        lineHeight: '1.8',
+        overflow: 'auto !important'
       },
       '.cm-content': {
-        padding: '2em 0',
+        padding: '2em 4em',
         minHeight: '100%'
       },
       '.cm-gutters': {
@@ -111,13 +114,9 @@ export function buildExtensions(
         padding: '0 8px',
         borderRadius: '3px'
       },
-      // Typora-compatible classes
       '.cm-line': {
-        paddingLeft: '3em',
-        paddingRight: '3em'
-      },
-      '&.cm-editor.cm-focused': {
-        outline: 'none'
+        paddingLeft: '0',
+        paddingRight: '0'
       }
     }, { dark: isDark }),
 
