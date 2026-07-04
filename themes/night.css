@@ -1,0 +1,97 @@
+/* Dark theme for My Markdown */
+:root {
+  --bg-color: #1e1e1e;
+  --text-color: #d4d4d4;
+  --primary-color: #569cd6;
+  --primary-btn-border-color: #4a8bc2;
+  --primary-btn-text-color: #ffffff;
+  --md-char-color: #555;
+  --meta-content-color: #808080;
+  --blur-text-color: #555;
+  --side-bar-bg-color: #252526;
+  --active-file-bg-color: #37373d;
+  --active-file-text-color: #ffffff;
+  --active-file-border-color: #569cd6;
+  --item-hover-bg-color: rgba(55, 55, 61, 0.8);
+  --item-hover-text-color: #ffffff;
+  --window-border: 1px solid #3c3c3c;
+  --monospace: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  --control-text-color: #cccccc;
+  --control-text-hover-color: #ffffff;
+  --rawblock-edit-panel-bd: #3c3c3c;
+  --search-hit-bg-color: #515c6a;
+  --search-select-bg-color: #656d76;
+}
+
+#write {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 48px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-color);
+  background: var(--bg-color);
+}
+
+#write h1 { font-size: 2em; font-weight: 600; margin: 24px 0 16px; padding-bottom: 0.3em; border-bottom: 1px solid #3c3c3c; color: #ffffff; }
+#write h2 { font-size: 1.5em; font-weight: 600; margin: 24px 0 16px; padding-bottom: 0.3em; border-bottom: 1px solid #3c3c3c; color: #ffffff; }
+#write h3 { font-size: 1.25em; font-weight: 600; margin: 24px 0 16px; color: #e0e0e0; }
+#write h4 { font-size: 1em; font-weight: 600; margin: 24px 0 16px; color: #e0e0e0; }
+
+#write a { color: var(--primary-color); text-decoration: none; }
+#write a:hover { text-decoration: underline; }
+
+#write code {
+  background: rgba(255,255,255,0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: var(--monospace);
+  font-size: 0.875em;
+}
+
+#write pre.md-fences {
+  background: #2d2d2d;
+  border: 1px solid #3c3c3c;
+  border-radius: 6px;
+  padding: 16px;
+  font-family: var(--monospace);
+  font-size: 0.875em;
+}
+
+#write pre.md-fences code { background: none; padding: 0; }
+
+#write blockquote {
+  border-left: 4px solid #3c3c3c;
+  padding: 0 1em;
+  color: #999;
+  margin: 0 0 16px;
+}
+
+#write ul, #write ol { padding-left: 2em; margin: 0 0 16px; }
+
+#write table { border-collapse: collapse; width: 100%; margin: 0 0 16px; }
+#write th, #write td { border: 1px solid #3c3c3c; padding: 6px 13px; text-align: left; }
+#write th { background: #2d2d2d; font-weight: 600; }
+#write tr:nth-child(even) { background: #262626; }
+
+#write hr { border: none; border-top: 1px solid #3c3c3c; margin: 24px 0; }
+
+pre.md-meta-block {
+  background: #2d2d2d;
+  border: 1px solid #3c3c3c;
+  border-radius: 6px;
+  padding: 16px;
+  font-family: var(--monospace);
+  font-size: 0.875em;
+}
+
+.cm-s-inner .cm-keyword { color: #569cd6; }
+.cm-s-inner .cm-string { color: #ce9178; }
+.cm-s-inner .cm-comment { color: #6a9955; font-style: italic; }
+.cm-s-inner .cm-number { color: #b5cea8; }
+.cm-s-inner .cm-variable { color: #9cdcfe; }
+.cm-s-inner .cm-variable-2 { color: #4fc1ff; }
+.cm-s-inner .cm-def { color: #dcdcaa; }
+.cm-s-inner .cm-tag { color: #569cd6; }
+.cm-s-inner .cm-attribute { color: #9cdcfe; }
+.cm-s-inner .cm-builtin { color: #dcdcaa; }

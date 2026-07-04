@@ -1,0 +1,27 @@
+appId: com.mymarkdown.editor
+productName: My Markdown
+directories:
+  buildResources: resources
+  output: dist
+files:
+  - out/**/*
+  - "!node_modules/**/*"
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: resources/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+fileAssociations:
+  - ext: md
+    name: Markdown File
+    description: Markdown Document
+  - ext: markdown
+    name: Markdown File
+    description: Markdown Document
+  - ext: mdx
+    name: Markdown File
+    description: Markdown Extended Document
