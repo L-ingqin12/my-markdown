@@ -151,4 +151,49 @@ export function registerIpcHandlers(): void {
     if (themeCss) options.themeCss = themeCss
     return exportDoc(content, filePath, options)
   })
+
+  // Git handlers
+  const { getGitStatus, gitCommit, gitCommitAll, gitPush, gitPull, gitLog, gitInit, gitDiff } = require('./git-manager')
+  ipcMain.handle(IPC.GIT_STATUS, async (_e, filePath?: string) => getGitStatus(filePath))
+  ipcMain.handle(IPC.GIT_COMMIT, async (_e, filePath: string, message: string) => gitCommit(filePath, message))
+  ipcMain.handle(IPC.GIT_COMMIT_ALL, async (_e, repoPath: string, message: string) => gitCommitAll(repoPath, message))
+  ipcMain.handle(IPC.GIT_PUSH, async (_e, repoPath: string) => gitPush(repoPath))
+  ipcMain.handle(IPC.GIT_PULL, async (_e, repoPath: string) => gitPull(repoPath))
+  ipcMain.handle(IPC.GIT_LOG, async (_e, repoPath: string, count?: number) => gitLog(repoPath, count))
+  ipcMain.handle(IPC.GIT_INIT, async (_e, repoPath: string) => gitInit(repoPath))
+  ipcMain.handle(IPC.GIT_DIFF, async (_e, filePath: string) => gitDiff(filePath))
+
+  // Claude CLI handlers
+  const { ClaudeManager } = require('./claude-manager')
+  const { ConversationQueue } = require('./conversation-queue')
+  const claudeManager = new ClaudeManager()
+  const convQueue = new ConversationQueue(10)
+
+  ipcMain.handle(IPC.CLAUDE_SPAWN, async (_e, conversationId: string) => {
+    const info = claudeManager.spawnInstance(conversationId)
+    return info.id
+  })
+  ipcMain.handle(IPC.CLAUDE_SEND_PROMPT, async (_e, instanceId: string, prompt: string) => {
+    return claudeManager.sendPrompt(instanceId, prompt)
+  })
+  ipcMain.handle(IPC.CLAUDE_KILL, async (_e, instanceId: string) => {
+    return claudeManager.killInstance(instanceId)
+  })
+  ipcMain.handle(IPC.CLAUDE_KILL_ALL, async () => {
+    claudeManager.killAll()
+  })
+  ipcMain.handle(IPC.CLAUDE_LIST, async () => {
+    return claudeManager.getInstances()
+  })
+
+  // Bridge Claude events to renderer
+  claudeManager.on('output', (instanceId: string, text: string) => {
+    BrowserWindow.getAllWindows().forEach(w => w.webContents.send(IPC.CLAUDE_OUTPUT, instanceId, text))
+  })
+  claudeManager.on('error-output', (instanceId: string, text: string) => {
+    BrowserWindow.getAllWindows().forEach(w => w.webContents.send(IPC.CLAUDE_ERROR_OUTPUT, instanceId, text))
+  })
+  claudeManager.on('exited', (instanceId: string, info: Record<string, unknown>) => {
+    BrowserWindow.getAllWindows().forEach(w => w.webContents.send(IPC.CLAUDE_EXITED, instanceId, info))
+  })
 }

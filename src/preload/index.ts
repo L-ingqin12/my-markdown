@@ -206,7 +206,17 @@ const api = {
     const handler = (_e: Electron.IpcRendererEvent, depth: number) => callback(depth)
     ipcRenderer.on(IPC.CLAUDE_QUEUE_STATUS, handler)
     return () => { ipcRenderer.removeListener(IPC.CLAUDE_QUEUE_STATUS, handler) }
-  }
+  },
+
+  // Git operations
+  gitStatus: (filePath?: string): Promise<any> => ipcRenderer.invoke(IPC.GIT_STATUS, filePath),
+  gitCommit: (filePath: string, message: string): Promise<boolean> => ipcRenderer.invoke(IPC.GIT_COMMIT, filePath, message),
+  gitCommitAll: (repoPath: string, message: string): Promise<boolean> => ipcRenderer.invoke(IPC.GIT_COMMIT_ALL, repoPath, message),
+  gitPush: (repoPath: string): Promise<boolean> => ipcRenderer.invoke(IPC.GIT_PUSH, repoPath),
+  gitPull: (repoPath: string): Promise<boolean> => ipcRenderer.invoke(IPC.GIT_PULL, repoPath),
+  gitLog: (repoPath: string, count?: number): Promise<any[]> => ipcRenderer.invoke(IPC.GIT_LOG, repoPath, count),
+  gitInit: (repoPath: string): Promise<boolean> => ipcRenderer.invoke(IPC.GIT_INIT, repoPath),
+  gitDiff: (filePath: string): Promise<string> => ipcRenderer.invoke(IPC.GIT_DIFF, filePath)
 }
 
 contextBridge.exposeInMainWorld('api', api)
