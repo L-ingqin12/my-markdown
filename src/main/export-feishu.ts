@@ -155,7 +155,6 @@ const LANG_MAP: Record<string, number> = {
   r: 29,
   haskell: 30,
   hs: 30,
-  scala: 20,
   plain: 0,
   text: 0,
 }

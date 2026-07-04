@@ -26,7 +26,7 @@ export interface AIProvider {
 }
 
 export class AnthropicProvider implements AIProvider {
-  readonly name = 'anthropic'
+  readonly name: string = 'anthropic'
   private client: Anthropic
   private model: string
 
@@ -86,7 +86,7 @@ export class AnthropicProvider implements AIProvider {
 }
 
 export class OpenAIProvider implements AIProvider {
-  readonly name = 'openai'
+  readonly name: string = 'openai'
   protected client: OpenAI
   protected model: string
 
@@ -145,7 +145,7 @@ export class OpenAIProvider implements AIProvider {
 }
 
 export class CustomProvider extends OpenAIProvider {
-  readonly name = 'custom'
+  override readonly name: string = 'custom'
 
   constructor(config: ProviderConfig) {
     super(config)

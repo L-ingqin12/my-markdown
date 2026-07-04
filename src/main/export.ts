@@ -147,7 +147,7 @@ export async function exportPdf(
   const pdfData = await pdfWin.webContents.printToPDF({
     printBackground: true,
     preferCSSPageSize: true,
-    margins: { top: '15mm', bottom: '15mm', left: '15mm', right: '15mm' },
+    margins: { marginType: 'custom' as const, top: 15, bottom: 15, left: 15, right: 15 },
   })
 
   await writeFile(savePath, pdfData)
