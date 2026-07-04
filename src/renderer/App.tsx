@@ -118,9 +118,15 @@ function AppInner() {
             window.api.setTitle('My Markdown - Untitled')
             break
           case 'Enter':
-            // Ctrl+Enter = execute AI block (Jupyter-style)
             e.preventDefault()
             ctx.editorRef.current?.executeAiBlock()
+            break
+          case 'Y':
+          case 'y':
+            if (e.shiftKey) {
+              e.preventDefault()
+              ctx.editorRef.current?.insertFrontMatter()
+            }
             break
           case 'K':
           case 'k':

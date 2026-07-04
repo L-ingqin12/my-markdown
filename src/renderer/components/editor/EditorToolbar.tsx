@@ -18,6 +18,7 @@ export function EditorToolbar() {
         ctx.setContent(''); ctx.setFilePath(null); ctx.setFileName('Untitled'); ctx.setIsModified(false)
       }}>New</button>
       <button onClick={handleSave} title="Save (Ctrl+S)">Save</button>
+      <button onClick={() => editor?.insertFrontMatter()} title="Insert YAML frontmatter (Ctrl+Shift+Y)">FM</button>
       <span className="separator" />
       <button onClick={() => editor?.undo()} title="Undo (Ctrl+Z)">&#x21A9;</button>
       <button onClick={() => editor?.redo()} title="Redo (Ctrl+Shift+Z)">&#x21AA;</button>

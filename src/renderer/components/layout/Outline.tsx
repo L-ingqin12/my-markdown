@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 
 interface Heading {
   level: number
@@ -8,9 +8,10 @@ interface Heading {
 
 interface OutlineProps {
   content: string
+  onHeadingClick?: (line: number) => void
 }
 
-export function Outline({ content }: OutlineProps) {
+export function Outline({ content, onHeadingClick }: OutlineProps) {
   const headings = useMemo<Heading[]>(() => {
     const lines = content.split('\n')
     const result: Heading[] = []
@@ -27,22 +28,28 @@ export function Outline({ content }: OutlineProps) {
     return result
   }, [content])
 
+  const handleClick = useCallback((line: number) => {
+    // Try to scroll via the CodeMirror editor
+    const scroller = document.querySelector('.cm-scroller') as HTMLElement | null
+    if (scroller) {
+      // Calculate approximate position: each line ~28px height with 1.8 line-height at 16px
+      const lineHeight = 16 * 1.8  // ~28.8px
+      const paddingTop = 32 // 2em padding
+      const targetY = paddingTop + line * lineHeight
+      scroller.scrollTo({
+        top: targetY - 100, // offset to show some context above
+        behavior: 'smooth'
+      })
+    }
+    onHeadingClick?.(line)
+  }, [onHeadingClick])
+
   if (headings.length === 0) {
     return (
       <div style={{ padding: '16px', color: '#aaa', fontSize: '13px', textAlign: 'center' }}>
         No headings found
       </div>
     )
-  }
-
-  const handleClick = (line: number) => {
-    const editorEl = document.querySelector('.cm-content')
-    if (editorEl) {
-      const lines = editorEl.querySelectorAll('.cm-line')
-      if (lines[line]) {
-        lines[line].scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }
-    }
   }
 
   return (
