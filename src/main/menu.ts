@@ -1,4 +1,5 @@
 import { Menu, BrowserWindow, app } from 'electron'
+import { IPC } from '../shared/ipc-channels'
 
 export function buildMenu(): void {
   const isMac = process.platform === 'darwin'
@@ -116,6 +117,6 @@ export function buildMenu(): void {
 function sendAction(action: string): void {
   const win = BrowserWindow.getFocusedWindow()
   if (win) {
-    win.webContents.send('menu:action', action)
+    win.webContents.send(IPC.MENU_ACTION, action)
   }
 }

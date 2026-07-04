@@ -5,7 +5,7 @@ import { getPreferences, setPreferences, getTheme, setTheme } from './preference
 import { uploadImages, getUploadConfig, setUploadConfig, testUpload } from './image-uploader'
 import { getThemeList, loadThemeCss, getCurrentTheme } from './theme-manager'
 import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { app as electronApp } from 'electron'
 
 export function registerIpcHandlers(): void {
@@ -40,9 +40,20 @@ export function registerIpcHandlers(): void {
     return uploadImages(imagePaths)
   })
 
-  ipcMain.handle(IPC.IMAGE_UPLOAD_ALL, async (_e, content: string) => {
-    const result = await uploadImages([content])
-    return result
+  ipcMain.handle(IPC.IMAGE_UPLOAD_ALL, async (_e, content: string, basePath?: string) => {
+    // Parse markdown for local image references
+    const localImgRegex = /!\[.*?\]\((?!https?:\/\/)(?!data:)([^)]+)\)/g
+    const localPaths: string[] = []
+    let match
+    while ((match = localImgRegex.exec(content)) !== null) {
+      const imgPath = match[1]
+      // Resolve relative paths
+      const resolved = basePath ? join(dirname(basePath), imgPath) : imgPath
+      localPaths.push(resolved)
+    }
+    if (localPaths.length === 0) return []
+    const urls = await uploadImages(localPaths, basePath)
+    return urls
   })
 
   ipcMain.handle(IPC.IMAGE_GET_CONFIG, async () => {

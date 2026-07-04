@@ -1,6 +1,8 @@
 import React, { useEffect, useCallback } from 'react'
 import { EditorProvider, useEditor } from './contexts/EditorContext'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { ChatProvider } from './contexts/ChatContext'
+import { ClaudeProvider } from './contexts/ClaudeContext'
 import { AppLayout } from './components/layout/AppLayout'
 import { useFileSystem } from './hooks/useFileSystem'
 import { useAutoSave } from './hooks/useAutoSave'
@@ -180,7 +182,9 @@ export function App() {
     <ThemeProvider>
       <EditorProvider>
         <ChatProvider>
-          <AppInner />
+          <ClaudeProvider>
+            <AppInner />
+          </ClaudeProvider>
         </ChatProvider>
       </EditorProvider>
     </ThemeProvider>

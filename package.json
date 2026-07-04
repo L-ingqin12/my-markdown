@@ -36,7 +36,6 @@
     "@lezer/highlight": "^1.2.0",
     "codemirror-markdown-hybrid": "^1.2.0",
     "electron-store": "^8.1.0",
-    "ex": "^0.1.4",
     "lz-string": "^1.5.0",
     "markmap-lib": "^0.18.12",
     "markmap-view": "^0.18.12",

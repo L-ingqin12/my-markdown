@@ -62,16 +62,30 @@ npm run package
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+S` | Save |
+| `Ctrl+N` | New document |
 | `Ctrl+O` | Open file |
+| `Ctrl+S` | Save |
+| `Ctrl+Shift+S` | Save As |
+| `Ctrl+Z` / `Ctrl+Shift+Z` | Undo / Redo |
 | `Ctrl+B` / `Ctrl+I` | Bold / Italic |
 | `Ctrl+K` | Insert link |
-| `Ctrl+Enter` | Execute AI cell |
-| `Ctrl+\` | Source code mode |
+| `Ctrl+Shift+I` | Insert image |
+| `Ctrl+Shift+Y` | Insert YAML frontmatter |
+| `Ctrl+\` | Toggle source code mode |
 | `Ctrl+Shift+F` | Focus mode |
+| `Ctrl+Shift+T` | Typewriter mode |
+| `Ctrl+Shift+L` | Toggle sidebar |
+| `Ctrl+Enter` | Execute AI cell (in :::ai block) |
 | `Ctrl+Shift+K` | Toggle Kanban |
-| `Ctrl+Shift+M` | Toggle Mind Map |
-| `Ctrl+Shift+A` | AI Chat panel |
+| `Ctrl+0` / `Ctrl+=` / `Ctrl+-` | Zoom reset / in / out |
+| `F12` | Developer tools |
+
+### Git Integration
+
+Git operations are available via the menu and IPC API:
+- Auto-commit on save
+- View file status in sidebar
+- Push/pull from connected remotes
 
 ## AI Cell Format
 

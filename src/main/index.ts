@@ -4,6 +4,7 @@ import { registerIpcHandlers } from './ipc-handlers'
 import { registerAiHandlers } from './ai-handlers'
 import { buildMenu } from './menu'
 import { loadPreferences } from './preferences'
+import { appStore } from './store'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -41,7 +42,7 @@ function createWindow(): void {
     if (mainWindow) {
       const bounds = mainWindow.getBounds()
       const maximized = mainWindow.isMaximized()
-      prefs.windowBounds = { ...bounds, isMaximized: maximized }
+      appStore.set('windowBounds', { ...bounds, isMaximized: maximized })
     }
   })
 

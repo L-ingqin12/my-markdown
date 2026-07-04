@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Editor from '../editor/Editor'
 import { EditorToolbar } from '../editor/EditorToolbar'
 import { Sidebar } from './Sidebar'
@@ -16,14 +16,6 @@ import { ChatPanel } from '../chat/ChatPanel'
 
 export function AppLayout() {
   const ctx = useEditor()
-  const [showPrefs, setShowPrefs] = useState(false)
-  const [showAbout, setShowAbout] = useState(false)
-  const [showUploadConfig, setShowUploadConfig] = useState(false)
-
-  // Expose dialog toggles to ctx
-  ctx.setShowThemeDialog = (v: boolean) => setShowPrefs(true)
-  ctx.setShowAbout = (v: boolean) => setShowAbout(v)
-  ctx.setShowExportResult = (v: boolean) => { /* handled by status bar */ }
 
   return (
     <>
@@ -32,8 +24,8 @@ export function AppLayout() {
         <Sidebar
           content={ctx.content}
           visible={ctx.sidebarVisible}
-          onUploadConfig={() => setShowUploadConfig(true)}
-          onPreferences={() => setShowPrefs(true)}
+          onUploadConfig={() => ctx.setShowThemeDialog(true)}
+          onPreferences={() => ctx.setShowThemeDialog(true)}
         />
         <div className="app-editor-area">
           {ctx.viewMode === 'kanban' ? (
@@ -54,20 +46,18 @@ export function AppLayout() {
               sourceMode={ctx.sourceMode}
             />
           )}
-          {ctx.showSearch && ctx.viewMode !== 'kanban' && <SearchPanel />}
+          {ctx.showSearch && ctx.viewMode === 'editor' && <SearchPanel />}
         </div>
       </div>
       <ChatPanel />
       <StatusBar
-        onUploadConfig={() => setShowUploadConfig(true)}
-        onPreferences={() => setShowPrefs(true)}
-        onAbout={() => setShowAbout(true)}
+        onUploadConfig={() => ctx.setShowThemeDialog(true)}
+        onPreferences={() => ctx.setShowThemeDialog(true)}
+        onAbout={() => ctx.setShowAbout(true)}
       />
 
-      {/* Dialogs */}
-      {showPrefs && <PreferencesDialog onClose={() => setShowPrefs(false)} />}
-      {showAbout && <AboutDialog onClose={() => setShowAbout(false)} />}
-      {showUploadConfig && <UploadConfig onClose={() => setShowUploadConfig(false)} />}
+      {ctx.showThemeDialog && <UploadConfig onClose={() => ctx.setShowThemeDialog(false)} />}
+      {ctx.showAbout && <AboutDialog onClose={() => ctx.setShowAbout(false)} />}
     </>
   )
 }

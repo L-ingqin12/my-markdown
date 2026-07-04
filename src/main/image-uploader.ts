@@ -99,7 +99,7 @@ async function uploadViaPicGoHttp(imagePaths: string[]): Promise<string[]> {
         method: 'POST',
         headers: {
           'Content-Type': `multipart/form-data; boundary=${boundary}`,
-          'Content-Length': Buffer.byteLength(body)
+          'Content-Length': body.length
         }
       }, (res) => {
         let data = ''
@@ -129,18 +129,16 @@ async function uploadViaPicGoHttp(imagePaths: string[]): Promise<string[]> {
   return results
 }
 
-function buildMultipartBody(filePath: string, boundary: string): string {
+function buildMultipartBody(filePath: string, boundary: string): Buffer {
   const fs = require('fs')
   const fileName = basename(filePath)
-  const fileContent = fs.readFileSync(filePath)
+  const fileContent: Buffer = fs.readFileSync(filePath)
 
-  let body = ''
-  body += `--${boundary}\r\n`
-  body += `Content-Disposition: form-data; name="image"; filename="${fileName}"\r\n`
-  body += `Content-Type: image/${extname(filePath).slice(1) || 'png'}\r\n\r\n`
-  body += fileContent.toString('binary')
-  body += `\r\n--${boundary}--\r\n`
-  return body
+  const header = Buffer.from(
+    `--${boundary}\r\nContent-Disposition: form-data; name="image"; filename="${fileName}"\r\nContent-Type: image/${extname(filePath).slice(1) || 'png'}\r\n\r\n`
+  )
+  const footer = Buffer.from(`\r\n--${boundary}--\r\n`)
+  return Buffer.concat([header, fileContent, footer])
 }
 
 async function uploadViaCustomCommand(imagePaths: string[], command: string): Promise<string[]> {

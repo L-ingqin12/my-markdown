@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { EditorView } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
+import { undo, redo } from '@codemirror/commands'
 import { buildExtensions, buildSourceExtensions } from './extensions'
 import { useEditor, EditorHandle } from '../../contexts/EditorContext'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -75,7 +76,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
       view.destroy()
       viewRef.current = null
     }
-  }, [sourceMode]) // Only recreate on source mode toggle
+  }, [sourceMode, isDark, preferences?.showLineNumbers, preferences?.fontSize, preferences?.fontFamily])
 
   // Update content when it changes externally (e.g., file open)
   useEffect(() => {
@@ -336,8 +337,8 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
       view.dispatch({ changes: { from: 0, insert: fm } })
       view.focus()
     },
-    undo: () => { /* handled by CM6 keymap */ },
-    redo: () => { /* handled by CM6 keymap */ },
+    undo: () => { const v = viewRef.current; if (v) undo(v) },
+    redo: () => { const v = viewRef.current; if (v) redo(v) },
     find: () => { setShowSearch(true) },
     findNext: () => { setShowSearch(true) },
     findPrevious: () => { setShowSearch(true) },

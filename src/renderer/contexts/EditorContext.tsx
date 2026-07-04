@@ -32,11 +32,14 @@ interface EditorContextValue {
   setShowSearch: (s: boolean) => void
   editorRef: React.MutableRefObject<EditorHandle | null>
   preferences: Preferences
+  showThemeDialog: boolean
   setShowThemeDialog: (v: boolean) => void
+  showAbout: boolean
   setShowAbout: (v: boolean) => void
+  showExportResult: boolean
   setShowExportResult: (v: boolean) => void
   viewMode: 'editor' | 'kanban' | 'mindmap' | 'graph'
-  setViewMode: (mode: string) => void
+  setViewMode: (mode: 'editor' | 'kanban' | 'mindmap' | 'graph') => void
 }
 
 export interface EditorHandle {
@@ -105,8 +108,11 @@ const EditorContext = createContext<EditorContextValue>({
   setShowSearch: () => {},
   editorRef: { current: null },
   preferences: defaultPreferences,
+  showThemeDialog: false,
   setShowThemeDialog: () => {},
+  showAbout: false,
   setShowAbout: () => {},
+  showExportResult: false,
   setShowExportResult: () => {},
   viewMode: 'editor',
   setViewMode: () => {}
@@ -124,9 +130,11 @@ export function EditorProvider({ children }: { children: React.ReactNode }) {
   const [showSearch, setShowSearch] = useState(false)
   const [viewMode, setViewMode] = useState<'editor' | 'kanban' | 'mindmap' | 'graph'>('editor')
   const [preferences, setPreferences] = useState<Preferences>(defaultPreferences)
+  const [showThemeDialog, setShowThemeDialog] = useState(false)
+  const [showAbout, setShowAbout] = useState(false)
+  const [showExportResult, setShowExportResult] = useState(false)
   const editorRef = useRef<EditorHandle | null>(null)
 
-  // Load preferences on mount
   React.useEffect(() => {
     window.api.getPreferences().then(p => {
       if (p) setPreferences(p as Preferences)
@@ -145,10 +153,10 @@ export function EditorProvider({ children }: { children: React.ReactNode }) {
       sidebarVisible, setSidebarVisible,
       showSearch, setShowSearch,
       editorRef, preferences,
-      viewMode, setViewMode: (mode: string) => setViewMode(mode as 'editor' | 'kanban' | 'mindmap' | 'graph'),
-      setShowThemeDialog: () => {},
-      setShowAbout: () => {},
-      setShowExportResult: () => {}
+      viewMode, setViewMode,
+      showThemeDialog, setShowThemeDialog,
+      showAbout, setShowAbout,
+      showExportResult, setShowExportResult
     }}>
       {children}
     </EditorContext.Provider>
