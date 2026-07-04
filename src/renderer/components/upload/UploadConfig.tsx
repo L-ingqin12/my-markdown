@@ -15,7 +15,7 @@ interface UploadConfigProps {
 }
 
 export function UploadConfig({ onClose }: UploadConfigProps) {
-  const [config, setConfig] = useState<UploadConfig>({ service: 'none' })
+  const [config, setConfig] = useState<UploadConfig>({ service: 'local' })
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<string | null>(null)
 
@@ -59,11 +59,11 @@ export function UploadConfig({ onClose }: UploadConfigProps) {
             value={config.service}
             onChange={e => setConfig({ ...config, service: e.target.value })}
           >
-            <option value="none">None (keep local paths)</option>
-            <option value="picgo">PicGo (Auto-detect)</option>
-            <option value="smms">SM.MS</option>
-            <option value="github">GitHub</option>
-            <option value="custom-command">Custom Command</option>
+            <option value="local">Local Assets Folder (default)</option>
+            <option value="picgo">PicGo (auto-detect, port 36677)</option>
+            <option value="smms">SM.MS (free image hosting)</option>
+            <option value="github">GitHub Repository</option>
+            <option value="custom-command">Custom Upload Script</option>
           </select>
         </div>
 

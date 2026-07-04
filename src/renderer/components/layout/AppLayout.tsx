@@ -8,6 +8,7 @@ import { useEditor } from '../../contexts/EditorContext'
 import { KanbanView } from '../kanban/KanbanView'
 import { MindMapView } from '../graph/MindMapView'
 import { KnowledgeGraph } from '../graph/KnowledgeGraph'
+import { WelcomeScreen } from './WelcomeScreen'
 import { PreferencesDialog } from '../dialogs/PreferencesDialog'
 import { AboutDialog } from '../dialogs/AboutDialog'
 import { UploadConfig } from '../upload/UploadConfig'
@@ -45,6 +46,8 @@ export function AppLayout() {
               currentPath={ctx.filePath || undefined}
               onNodeClick={() => {}}
             />
+          ) : !ctx.filePath && !ctx.content ? (
+            <WelcomeScreen />
           ) : (
             <Editor
               ref={ctx.editorRef}

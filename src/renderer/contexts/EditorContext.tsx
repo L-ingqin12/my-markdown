@@ -120,7 +120,7 @@ export function EditorProvider({ children }: { children: React.ReactNode }) {
   const [sourceMode, setSourceMode] = useState(false)
   const [focusMode, setFocusMode] = useState(false)
   const [typewriterMode, setTypewriterMode] = useState(false)
-  const [sidebarVisible, setSidebarVisible] = useState(false)
+  const [sidebarVisible, setSidebarVisible] = useState(true)
   const [showSearch, setShowSearch] = useState(false)
   const [viewMode, setViewMode] = useState<'editor' | 'kanban' | 'mindmap' | 'graph'>('editor')
   const [preferences, setPreferences] = useState<Preferences>(defaultPreferences)

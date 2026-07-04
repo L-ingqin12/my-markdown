@@ -15,6 +15,7 @@ import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { GFM } from '@lezer/markdown'
+import { wysiwygPlugin, wysiwygTheme } from './wysiwyg-extension'
 
 export function buildExtensions(
   onChange: (content: string) => void,
@@ -52,6 +53,10 @@ export function buildExtensions(
       codeLanguages: languages,
       extensions: GFM
     }),
+
+    // WYSIWYG (hides markdown syntax, shows rendered content)
+    wysiwygPlugin,
+    wysiwygTheme,
 
     // Syntax highlighting
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
