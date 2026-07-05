@@ -32,7 +32,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const loadTheme = useCallback(async (name: string) => {
     try {
-      const css = await window.api.loadThemeCss(name)
+      let css = await window.api.loadThemeCss(name)
+      // Scope all theme CSS to #write to prevent leaking into toolbar/sidebar
+      css = `@scope (#write) {\n${css}\n}`
       setThemeCss(css)
       setThemeState(name)
     } catch {
