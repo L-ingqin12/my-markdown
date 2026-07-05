@@ -106,11 +106,9 @@ export function buildExtensions(
         overflowX: 'hidden !important',
         backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
-      '#write, .cm-content': {
+      '.cm-content': {
         padding: '60px 0 40vh',
-        backgroundColor: isDark ? '#282c34' : '#ffffff !important',
-        columnCount: '1 !important',
-        columnWidth: 'auto !important'
+        backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '.cm-line': {
         padding: '0'

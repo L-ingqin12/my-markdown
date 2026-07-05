@@ -330,6 +330,13 @@ html, body, #root {
   position: relative;
 }
 
+/* Prevent themes with aggressive layouts from breaking the editor */
+#write {
+  column-count: 1 !important;
+  column-width: auto !important;
+  column-gap: normal !important;
+}
+
 /* Editor area — wrapper handles width constraint, CM6 fills it */
 .editor-wrapper {
   flex: 1;
