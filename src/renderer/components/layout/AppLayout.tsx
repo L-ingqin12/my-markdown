@@ -57,7 +57,7 @@ export function AppLayout() {
             </Panel>
           </Group>
         ) : (
-          <div className="app-editor-area" style={{ width: '100%' }}>
+          <div className="app-editor-area" style={{ width: '100%', height: '100%' }}>
             {editorContent}
             {ctx.showSearch && ctx.viewMode === 'editor' && <SearchPanel />}
           </div>
