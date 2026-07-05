@@ -18,6 +18,7 @@ export function buildMenu(): void {
       submenu: [
         { label: 'New', accelerator: 'CmdOrCtrl+N', click: () => sendAction('file:new') },
         { label: 'Open...', accelerator: 'CmdOrCtrl+O', click: () => sendAction('file:open') },
+        { label: 'Open Folder...', accelerator: 'CmdOrCtrl+Shift+O', click: () => sendAction('file:open-folder') },
         { type: 'separator' },
         { label: 'Save', accelerator: 'CmdOrCtrl+S', click: () => sendAction('file:save') },
         { label: 'Save As...', accelerator: 'CmdOrCtrl+Shift+S', click: () => sendAction('file:save-as') },

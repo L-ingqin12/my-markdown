@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Outline } from './Outline'
 import { FileTree } from './FileTree'
 import { FileInfo } from './FileInfo'
+import { FolderSearch } from './FolderSearch'
 import { TagPanel } from './TagPanel'
 import { useEditor } from '../../contexts/EditorContext'
 import { extractTags } from '../../utils/wikilink'
@@ -13,7 +14,7 @@ interface SidebarProps {
   onPreferences: () => void
 }
 
-type TabId = 'files' | 'outline' | 'tags' | 'settings'
+type TabId = 'files' | 'search' | 'outline' | 'tags' | 'settings'
 
 export function Sidebar({ content, visible, onUploadConfig, onPreferences }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabId>('files')
@@ -21,6 +22,7 @@ export function Sidebar({ content, visible, onUploadConfig, onPreferences }: Sid
 
   const tabs: { id: TabId; label: string; icon: string }[] = [
     { id: 'files', label: 'Files', icon: '📁' },
+    { id: 'search', label: 'Search', icon: '🔍' },
     { id: 'outline', label: 'Outline', icon: '📋' },
     { id: 'tags', label: 'Tags', icon: '🏷' },
     { id: 'settings', label: 'Settings', icon: '⚙' }
@@ -64,6 +66,10 @@ export function Sidebar({ content, visible, onUploadConfig, onPreferences }: Sid
               activeFile={ctx.filePath}
             />
           </>
+        )}
+
+        {activeTab === 'search' && (
+          <FolderSearch />
         )}
 
         {activeTab === 'outline' && (
