@@ -34,7 +34,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
     }
   }, [themeCss])
 
-  // Create editor view
+  // Create editor view — only on mount or sourceMode toggle (avoid rebuilds)
   useEffect(() => {
     if (!containerRef.current) return
 
@@ -67,32 +67,21 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
 
     viewRef.current = view
 
-    // Inject Typora theme CSS classes
-    const typoraStyle = document.createElement('style')
-    typoraStyle.id = 'typora-theme-style'
-    if (!document.getElementById('typora-theme-style')) {
-      document.head.appendChild(typoraStyle)
-    }
-
     return () => {
       view.destroy()
       viewRef.current = null
     }
-  }, [sourceMode, isDark, preferences?.showLineNumbers, preferences?.fontSize, preferences?.fontFamily])
+  }, [sourceMode]) // Only rebuild on source mode toggle
 
-  // Update content when it changes externally (e.g., file open)
+  // Update content efficiently — only when it differs from current
   useEffect(() => {
     const view = viewRef.current
     if (!view) return
-
     const currentContent = view.state.doc.toString()
     if (content !== currentContent) {
       view.dispatch({
-        changes: {
-          from: 0,
-          to: currentContent.length,
-          insert: content
-        }
+        changes: { from: 0, to: view.state.doc.length, insert: content },
+        scrollIntoView: false
       })
     }
   }, [content])
