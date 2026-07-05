@@ -1,5 +1,4 @@
 import React from 'react'
-import { Panel, Group, Separator } from 'react-resizable-panels'
 import Editor from '../editor/Editor'
 import { EditorToolbar } from '../editor/EditorToolbar'
 import { Sidebar } from './Sidebar'
@@ -41,30 +40,21 @@ export function AppLayout() {
     <>
       <EditorToolbar />
       <div className="app-body">
-        {ctx.sidebarVisible ? (
-          <Group direction="horizontal">
-            <Panel defaultSize="20%" minSize="15%" maxSize="35%">
-              <Sidebar
-                content={ctx.content}
-                visible={true}
-                onUploadConfig={() => ctx.setShowUploadConfig(true)}
-                onPreferences={() => ctx.setShowPreferences(true)}
-              />
-            </Panel>
-            <Separator className="sidebar-resize-handle" />
-            <Panel defaultSize="80%" minSize="50%">
-              <div className="app-editor-area">
-                {editorContent}
-                {ctx.showSearch && <SearchPanel />}
-              </div>
-            </Panel>
-          </Group>
-        ) : (
-          <div className="app-editor-area" style={{ width: '100%', height: '100%' }}>
-            {editorContent}
-            {ctx.showSearch && <SearchPanel />}
-          </div>
+        {ctx.sidebarVisible && (
+          <Sidebar
+            content={ctx.content}
+            visible={true}
+            onUploadConfig={() => ctx.setShowUploadConfig(true)}
+            onPreferences={() => ctx.setShowPreferences(true)}
+          />
         )}
+        <div
+          className="app-editor-area"
+          style={{ marginLeft: ctx.sidebarVisible ? '260px' : '0' }}
+        >
+          {editorContent}
+          {ctx.showSearch && <SearchPanel />}
+        </div>
       </div>
       <ChatPanel />
       <StatusBar

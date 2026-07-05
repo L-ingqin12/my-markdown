@@ -119,12 +119,17 @@ html, body, #root {
 }
 
 .app-sidebar {
-  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 20;
+  width: 260px;
   border-right: var(--window-border);
   background: var(--side-bar-bg-color);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* Folder search in sidebar */
