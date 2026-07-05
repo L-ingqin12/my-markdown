@@ -15,15 +15,18 @@ import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { GFM } from '@lezer/markdown'
-import { wysiwygPlugin, wysiwygTheme } from './wysiwyg-extension'
+import { hybridMarkdown, lightTheme, darkTheme } from 'codemirror-markdown-hybrid'
 
 export function buildExtensions(
   onChange: (content: string) => void,
   isDark: boolean,
   preferences?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean }
 ): Extension[] {
-  const exts: Extension[] = [
-    // Visual
+  const fontSize = preferences?.fontSize ?? 16
+  const fontFamily = preferences?.fontFamily ?? "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif"
+
+  return [
+    lineNumbers(),
     highlightActiveLineGutter(),
     highlightSpecialChars(),
     drawSelection(),
@@ -37,22 +40,31 @@ export function buildExtensions(
     closeBrackets(),
     autocompletion(),
     highlightSelectionMatches(),
-
-    // Gutters and folding
     foldGutter(),
-
-    // Line numbers (conditional)
-    ...(preferences?.showLineNumbers ? [lineNumbers()] : []),
-
-    // History
     history(),
 
-    // Markdown language with GFM
+    // Markdown language
     markdown({
       base: markdownLanguage,
       codeLanguages: languages,
       extensions: GFM
     }),
+
+    // WYSIWYG: hides markdown syntax, shows rendered content
+    hybridMarkdown({
+      renderHeadings: true,
+      renderBoldItalic: true,
+      renderCodeBlocks: true,
+      renderTables: true,
+      renderImages: true,
+      renderLinks: true,
+      renderTaskLists: true,
+      theme: isDark ? 'dark' : 'light',
+      strict: false
+    }),
+
+    // Hybrid theme
+    isDark ? darkTheme : lightTheme,
 
     // Syntax highlighting
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
@@ -68,75 +80,56 @@ export function buildExtensions(
       indentWithTab
     ]),
 
-    // Theme
     ...(isDark ? [oneDark] : []),
 
-    // Editor theme customization
+    // Editor appearance
     EditorView.theme({
       '&': {
         height: '100%',
-        fontSize: `${preferences?.fontSize ?? 16}px`,
+        fontSize: `${fontSize}px`,
         backgroundColor: isDark ? '#282c34' : '#ffffff'
       },
-      '&.cm-editor': {
-        outline: 'none !important'
-      },
-      '&.cm-editor.cm-focused': {
-        outline: 'none !important'
-      },
+      '&.cm-editor': { outline: 'none !important' },
+      '&.cm-editor.cm-focused': { outline: 'none !important' },
       '.cm-scroller': {
-        fontFamily: preferences?.fontFamily ?? "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif",
+        fontFamily,
         lineHeight: '1.8',
         overflow: 'auto !important'
       },
       '.cm-content': {
-        padding: '2em 4em',
-        minHeight: '100%'
+        padding: '3em 5em',
+        minHeight: '100%',
+        maxWidth: '900px',
+        margin: '0 auto'
       },
+      '.cm-line': { paddingLeft: '0', paddingRight: '0' },
       '.cm-gutters': {
         borderRight: 'none',
         backgroundColor: 'transparent',
         color: isDark ? '#555' : '#ccc'
       },
-      '.cm-activeLineGutter': {
-        backgroundColor: 'transparent'
-      },
-      '.cm-cursor': {
-        borderLeftColor: isDark ? '#fff' : '#000'
-      },
+      '.cm-activeLineGutter': { backgroundColor: 'transparent' },
+      '.cm-cursor': { borderLeftColor: isDark ? '#fff' : '#000' },
       '.cm-selectionBackground, ::selection': {
-        backgroundColor: isDark ? '#3a3f4b' : '#b3d7ff !important'
-      },
-      '.cm-foldPlaceholder': {
-        backgroundColor: isDark ? '#3a3f4b' : '#f0f0f0',
-        border: 'none',
-        color: isDark ? '#abb2bf' : '#888',
-        padding: '0 8px',
-        borderRadius: '3px'
-      },
-      '.cm-line': {
-        paddingLeft: '0',
-        paddingRight: '0'
+        backgroundColor: isDark ? '#3a3f4b' : '#b3d7ff'
       }
     }, { dark: isDark }),
 
-    // Change listener
     EditorView.updateListener.of(update => {
       if (update.docChanged) {
         onChange(update.state.doc.toString())
       }
     })
   ]
-
-  return exts
 }
 
-// Build simplified extensions for source code mode (no hybrid preview)
 export function buildSourceExtensions(
   onChange: (content: string) => void,
   isDark: boolean,
   preferences?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean }
 ): Extension[] {
+  const fontSize = preferences?.fontSize ?? 16
+
   return [
     lineNumbers(),
     highlightActiveLineGutter(),
@@ -157,11 +150,11 @@ export function buildSourceExtensions(
     EditorView.theme({
       '&': {
         height: '100%',
-        fontSize: `${preferences?.fontSize ?? 16}px`,
-        fontFamily: preferences?.fontFamily?.includes('monospace') ? preferences.fontFamily : "'Consolas', 'Fira Code', 'JetBrains Mono', monospace"
+        fontSize: `${fontSize}px`,
+        fontFamily: "'Consolas', 'Fira Code', 'JetBrains Mono', monospace"
       },
-      '.cm-content': { padding: '2em 0', minHeight: '100%' },
-      '.cm-line': { paddingLeft: '3em', paddingRight: '3em' },
+      '.cm-content': { padding: '2em 3em', minHeight: '100%' },
+      '.cm-line': { paddingLeft: '0', paddingRight: '0' },
       '&.cm-editor.cm-focused': { outline: 'none' }
     }, { dark: isDark }),
     EditorView.updateListener.of(update => {
