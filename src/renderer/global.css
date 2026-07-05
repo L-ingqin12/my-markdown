@@ -312,8 +312,7 @@ html, body, #root {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   position: relative;
 }
 
@@ -347,13 +346,10 @@ html, body, #root {
 .editor-wrapper {
   flex: 1;
   min-height: 0;
-  display: flex;
-  justify-content: center;
 }
 
 .editor-container {
   width: 100%;
-  max-width: 860px;
   height: 100%;
   overflow: hidden;
   position: relative;
@@ -361,6 +357,16 @@ html, body, #root {
 
 .editor-container .cm-editor {
   height: 100%;
+}
+
+.editor-container .cm-editor .cm-scroller {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.editor-container .cm-editor .cm-content {
+  max-width: 860px;
+  margin: 0 auto;
 }
 
 .editor-container .cm-editor .cm-scroller::-webkit-scrollbar { width: 8px; }

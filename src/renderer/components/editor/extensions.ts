@@ -102,7 +102,8 @@ export function buildExtensions(
       '.cm-scroller': {
         fontFamily,
         lineHeight: '1.7',
-        overflow: 'hidden !important',
+        overflow: 'auto !important',
+        overflowX: 'hidden !important',
         backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '.cm-content': {
