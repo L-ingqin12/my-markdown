@@ -170,12 +170,16 @@ export function buildExtensions(
       '.cm-scroller': {
         fontFamily,
         lineHeight: '1.7',
-        overflow: 'auto !important',
+        display: 'block !important',
+        width: '100% !important',
+        overflowY: 'auto !important',
         overflowX: 'hidden !important',
         backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '.cm-content': {
         padding: '60px 0 40vh',
+        maxWidth: '860px',
+        margin: '0 auto',
         backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '.cm-line': {

@@ -368,15 +368,6 @@ html, body, #root {
   height: 100%;
 }
 
-.editor-container .cm-editor .cm-scroller {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-}
-
-.editor-container .cm-editor .cm-content {
-  max-width: 860px;
-  margin: 0 auto;
-}
 
 .editor-container .cm-editor .cm-scroller::-webkit-scrollbar { width: 8px; }
 .editor-container .cm-editor .cm-scroller::-webkit-scrollbar-track { background: transparent; }
