@@ -21,7 +21,7 @@ import { hybridMarkdown, lightTheme, darkTheme } from 'codemirror-markdown-hybri
 export function buildExtensions(
   onChange: (content: string) => void,
   isDark: boolean,
-  prefs?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean },
+  prefs?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean; spellCheck?: boolean },
   onCursorMove?: (line: number, col: number) => void
 ): Extension[] {
   const fontSize = prefs?.fontSize ?? 18
@@ -154,6 +154,8 @@ export function buildExtensions(
         borderLeftWidth: '2px'
       }
     }, { dark: isDark }),
+
+    EditorView.contentAttributes.of({ spellcheck: prefs?.spellCheck ? 'true' : 'false' }),
 
     EditorView.updateListener.of(update => {
       if (update.docChanged) {

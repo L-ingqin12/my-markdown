@@ -314,10 +314,11 @@ html, body, #root {
   position: relative;
 }
 
-/* MindMap full area */
-.app-editor-area > div:first-child {
+/* MindMap / Graph / Kanban full area */
+.app-editor-area > * {
   flex: 1;
   min-height: 0;
+  width: 100%;
 }
 
 .editor-container {

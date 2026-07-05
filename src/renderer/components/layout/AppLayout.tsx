@@ -4,7 +4,6 @@ import Editor from '../editor/Editor'
 import { EditorToolbar } from '../editor/EditorToolbar'
 import { Sidebar } from './Sidebar'
 import { StatusBar } from './StatusBar'
-import { SearchPanel } from './SearchPanel'
 import { useEditor } from '../../contexts/EditorContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { KanbanView } from '../kanban/KanbanView'
@@ -54,7 +53,6 @@ export function AppLayout() {
             <Panel defaultSize="80%" minSize="50%">
               <div className="app-editor-area">
                 {editorContent}
-                {ctx.showSearch && ctx.viewMode === 'editor' && <SearchPanel />}
               </div>
             </Panel>
           </Group>

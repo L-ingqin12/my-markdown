@@ -67,12 +67,33 @@ app.whenReady().then(() => {
   buildMenu()
   createWindow()
 
+  // Open file from command line / file association (Windows)
+  const filePath = process.argv.find(a => a.endsWith('.md') || a.endsWith('.markdown') || a.endsWith('.mdx'))
+  if (filePath && mainWindow) {
+    mainWindow.webContents.on('did-finish-load', () => {
+      mainWindow?.webContents.send('menu:action', 'file:open-path:' + filePath)
+    })
+  }
+
+  app.on('second-instance', (_e, argv) => {
+    const fp = argv.find((a: string) => a.endsWith('.md'))
+    if (fp && mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+      mainWindow.webContents.send('menu:action', 'file:open-path:' + fp)
+    }
+  })
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow()
     }
   })
 })
+
+// Single instance lock for file association
+const gotLock = app.requestSingleInstanceLock()
+if (!gotLock) { app.quit() }
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

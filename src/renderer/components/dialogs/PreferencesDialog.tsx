@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useEditor } from '../../contexts/EditorContext'
 
 interface Preferences {
   fontSize: number
@@ -16,6 +17,7 @@ interface PreferencesDialogProps {
 }
 
 export function PreferencesDialog({ onClose }: PreferencesDialogProps) {
+  const editorCtx = useEditor()
   const [prefs, setPrefs] = useState<Preferences>({
     fontSize: 16,
     fontFamily: "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif",
@@ -39,6 +41,8 @@ export function PreferencesDialog({ onClose }: PreferencesDialogProps) {
 
   const handleSave = async () => {
     await window.api.setPreferences(prefs)
+    // Sync back to editor context so changes take effect immediately
+    Object.assign(editorCtx.preferences, prefs)
     onClose()
   }
 

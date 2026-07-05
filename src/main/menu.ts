@@ -105,7 +105,7 @@ export function buildMenu(): void {
       label: 'Help',
       submenu: [
         { label: 'About My Markdown', click: () => sendAction('help:about') },
-        { label: 'Toggle Developer Tools', accelerator: 'F12', click: () => sendAction('help:devtools') }
+        { label: 'Toggle Developer Tools', accelerator: 'F12', click: () => { const w = BrowserWindow.getFocusedWindow(); if (w) w.webContents.toggleDevTools() } }
       ]
     }
   ]

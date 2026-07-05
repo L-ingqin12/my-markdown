@@ -14,7 +14,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const editorCtx = useEditor()
-  const { content, setContent, setIsModified, setShowSearch, preferences, setCursorPos } = editorCtx
+  const { content, setContent, setIsModified, setShowSearch, preferences, setCursorPos, typewriterMode } = editorCtx
   const onCursorMove = useCallback((line: number, col: number) => {
     setCursorPos({ line, col })
   }, [setCursorPos])
@@ -349,10 +349,10 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
   }), [setShowSearch])
 
   return (
-    <div className="editor-wrapper">
+    <div className={`editor-wrapper ${typewriterMode ? 'typewriter-mode' : ''}`}>
       <div
         id="write"
-        className="editor-container"
+        className={`editor-container ${typewriterMode ? 'typewriter-mode' : ''}`}
         ref={containerRef}
         data-theme={theme}
       />

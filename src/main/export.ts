@@ -7,7 +7,18 @@ import { loadThemeCss, getCurrentTheme } from './theme-manager'
 // ---------------------------------------------------------------------------
 
 /** Default screen‑oriented CSS for HTML export */
-const EXPORT_CSS = `
+const HIGHLIGHT_CSS = `
+.hljs{display:block;overflow-x:auto;padding:0.5em;background:#f6f8fa;color:#24292e}
+.hljs-keyword,.hljs-selector-tag,.hljs-title{color:#d73a49}
+.hljs-string,.hljs-regexp{color:#032f62}
+.hljs-comment,.hljs-quote{color:#6a737d;font-style:italic}
+.hljs-number,.hljs-literal{color:#005cc5}
+.hljs-built_in,.hljs-type{color:#6f42c1}
+.hljs-attr,.hljs-variable{color:#e36209}
+.hljs-function .hljs-title{color:#6f42c1}
+`
+
+const EXPORT_CSS = HIGHLIGHT_CSS + `
 body { max-width: 860px; margin: 0 auto; padding: 2em; font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 16px; line-height: 1.7; color: #333; }
 pre { background: #f4f4f4; padding: 1em; border-radius: 4px; overflow-x: auto; }
 code { font-family: 'Consolas', 'Fira Code', monospace; font-size: 14px; }

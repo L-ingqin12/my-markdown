@@ -46,12 +46,15 @@ function AppInner() {
         case 'view:toggle-typewriter': ctx.setTypewriterMode(!ctx.typewriterMode); break
         case 'export:html': handleExportHtml(); break
         case 'export:pdf': handleExportPdf(); break
+        case 'export:feishu': handleExportFeishu(); break
+        case 'export:doc': handleExportDoc(); break
         case 'image:upload-all': uploadAllLocalImages(); break
-        case 'theme:select': ctx.setShowPreferences(true); break
-        case 'help:about': ctx.setShowAbout?.(true); break
-        case 'help:devtools':
-          // DevTools is toggled via main process menu shortcut (F12)
+        case 'theme:select':
+          // Focus the theme dropdown in status bar
+          const sel = document.querySelector('.app-statusbar select') as HTMLSelectElement
+          if (sel) { sel.focus(); sel.click() }
           break
+        case 'help:about': ctx.setShowAbout?.(true); break
         // Paragraph formatting
         case 'para:bold': ctx.editorRef.current?.toggleBold(); break
         case 'para:italic': ctx.editorRef.current?.toggleItalic(); break
@@ -158,12 +161,22 @@ function AppInner() {
   async function handleExportPdf() {
     try {
       const path = await window.api.exportPdf(ctx.content)
-      if (path) {
-        ctx.setShowExportResult?.(true)
-      }
-    } catch (err) {
-      console.error('Export PDF failed:', err)
-    }
+      if (path) { ctx.setShowExportResult?.(true) }
+    } catch (err) { console.error('Export PDF failed:', err) }
+  }
+
+  async function handleExportFeishu() {
+    try {
+      const path = await window.api.exportFeishu(ctx.content)
+      if (path) { ctx.setShowExportResult?.(true) }
+    } catch (err) { console.error('Export Feishu failed:', err) }
+  }
+
+  async function handleExportDoc() {
+    try {
+      const path = await window.api.exportDoc(ctx.content)
+      if (path) { ctx.setShowExportResult?.(true) }
+    } catch (err) { console.error('Export DOC failed:', err) }
   }
 
   return (
