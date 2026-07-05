@@ -67,14 +67,22 @@ export async function getThemeList(): Promise<{ name: string; displayName: strin
     ...userFiles.map(f => ({ path: f, isBuiltin: false }))
   ]
 
-  return all.map(({ path, isBuiltin }) => {
+  const seen = new Set<string>()
+  const themes: { name: string; displayName: string; isBuiltin: boolean }[] = []
+
+  for (const { path, isBuiltin } of all) {
     const fileName = path.split(/[/\\]/).pop() || ''
-    return {
-      name: fileName.replace(/\.css$/, ''),
+    const name = fileName.replace(/\.css$/, '')
+    if (seen.has(name)) continue
+    seen.add(name)
+    themes.push({
+      name,
       displayName: cssNameToDisplay(fileName),
       isBuiltin
-    }
-  })
+    })
+  }
+
+  return themes
 }
 
 export async function loadThemeCss(themeName: string): Promise<string> {
