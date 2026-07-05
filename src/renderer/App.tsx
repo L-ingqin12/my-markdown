@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react'
 import { EditorProvider, useEditor } from './contexts/EditorContext'
-import { ThemeProvider } from './contexts/ThemeContext'
+import { ThemeProvider, useTheme } from './contexts/ThemeContext'
 import { ChatProvider } from './contexts/ChatContext'
 import { ClaudeProvider } from './contexts/ClaudeContext'
 import { AppLayout } from './components/layout/AppLayout'
@@ -13,6 +13,7 @@ import { UploadConfig } from './components/upload/UploadConfig'
 
 function AppInner() {
   const ctx = useEditor()
+  const themeCtx = useTheme()
   const { openFile, saveFile, saveFileAs, openFileByPath } = useFileSystem()
   const { handlePaste, handleDrop, uploadAllLocalImages, uploading, uploadProgress } = useImageUpload()
   const { preferences } = ctx
@@ -49,11 +50,15 @@ function AppInner() {
         case 'export:feishu': handleExportFeishu(); break
         case 'export:doc': handleExportDoc(); break
         case 'image:upload-all': uploadAllLocalImages(); break
-        case 'theme:select':
-          // Focus the theme dropdown in status bar
-          const sel = document.querySelector('.app-statusbar select') as HTMLSelectElement
-          if (sel) { sel.focus(); sel.click() }
+        case 'theme:select': {
+          const list = themeCtx.themeList
+          if (list.length > 1) {
+            const idx = list.findIndex(t => t.name === themeCtx.theme)
+            const next = list[(idx + 1) % list.length]
+            if (next) themeCtx.setTheme(next.name)
+          }
           break
+        }
         case 'help:about': ctx.setShowAbout?.(true); break
         // Paragraph formatting
         case 'para:bold': ctx.editorRef.current?.toggleBold(); break
