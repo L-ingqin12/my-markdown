@@ -54,7 +54,7 @@ const mathPlugin = ViewPlugin.fromClass(class {
     const doc = view.state.doc
     const text = doc.toString()
 
-    // Block math: $$...$$ (multiline)
+    // Block math: $$...$$ (multiline) — use inline, block not allowed in ViewPlugin
     const blockRegex = /\$\$\n?([\s\S]*?)\n?\$\$/g
     let match
     while ((match = blockRegex.exec(text)) !== null) {
@@ -62,8 +62,7 @@ const mathPlugin = ViewPlugin.fromClass(class {
       const to = from + match[0].length
       if (from === to) continue
       builder.add(from, to, Decoration.replace({
-        widget: new MathWidget(match[1].trim(), true),
-        block: true
+        widget: new MathWidget(match[1].trim(), true)
       }))
     }
 
