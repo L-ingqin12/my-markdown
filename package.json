@@ -10,7 +10,8 @@
     "package": "electron-builder",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "npx playwright test --config test/e2e/playwright.config.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
