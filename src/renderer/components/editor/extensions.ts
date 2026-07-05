@@ -100,14 +100,10 @@ export function buildExtensions(
         fontFamily,
         lineHeight: '1.7',
         overflow: 'auto !important',
-        scrollbarGutter: 'stable',
-        width: '100%'
+        overflowX: 'hidden !important'
       },
       '.cm-content': {
-        width: 'min(860px, 100%)',
-        margin: '0 auto',
-        padding: '60px 0 40vh',
-        contain: 'layout style'
+        padding: '60px 0 40vh'
       },
       '.cm-line': {
         padding: '0'

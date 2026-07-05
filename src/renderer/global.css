@@ -320,12 +320,25 @@ html, body, #root {
   position: relative;
 }
 
-/* Editor area — CM6 handles its own layout; only constrain the container */
-.editor-container {
+/* Editor area — wrapper handles width constraint, CM6 fills it */
+.editor-wrapper {
   flex: 1;
   min-height: 0;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.editor-container {
+  width: 100%;
+  max-width: 860px;
+  height: 100%;
   overflow: hidden;
   position: relative;
+}
+
+.editor-container .cm-editor {
+  height: 100%;
 }
 
 .editor-container .cm-editor .cm-scroller::-webkit-scrollbar { width: 8px; }

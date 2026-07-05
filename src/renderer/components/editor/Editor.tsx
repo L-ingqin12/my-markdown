@@ -347,12 +347,14 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
   }), [setShowSearch])
 
   return (
-    <div
-      id="write"
-      className="editor-container"
-      ref={containerRef}
-      data-theme={theme}
-    />
+    <div className="editor-wrapper">
+      <div
+        id="write"
+        className="editor-container"
+        ref={containerRef}
+        data-theme={theme}
+      />
+    </div>
   )
 })
 
