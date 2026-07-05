@@ -1,7 +1,7 @@
 import { dialog, BrowserWindow } from 'electron'
-import { readFile, writeFile, access, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import { dirname, basename } from 'path'
+import { readFile, writeFile, access, mkdir, readdir } from 'fs/promises'
+import { existsSync, statSync } from 'fs'
+import { dirname, basename, join } from 'path'
 import { recentFilesStore } from './store'
 
 const MARKDOWN_FILTERS = [
@@ -80,3 +80,44 @@ export async function readFileByPath(filePath: string): Promise<FileResult | nul
 export function getRecentFiles(): string[] {
   return recentFilesStore.getRecent()
 }
+
+export async function openFolderDialog(): Promise<{ folderPath: string; files: Array<{ path: string; name: string }> } | null> {
+  const win = BrowserWindow.getFocusedWindow()
+  if (!win) return null
+
+  const result = await dialog.showOpenDialog(win, {
+    title: 'Open Folder',
+    properties: ['openDirectory']
+  })
+
+  if (result.canceled || result.filePaths.length === 0) return null
+  const folderPath = result.filePaths[0]
+  const files = await scanFolder(folderPath)
+  return { folderPath, files }
+}
+
+export async function scanFolder(folderPath: string): Promise<Array<{ path: string; name: string }>> {
+  const results: Array<{ path: string; name: string }> = []
+  const MD_EXT = new Set(['.md', '.markdown', '.mdown', '.mkd', '.mdx', '.txt'])
+
+  async function walk(dir: string) {
+    try {
+      const entries = await readdir(dir, { withFileTypes: true })
+      for (const entry of entries) {
+        const fullPath = join(dir, entry.name)
+        if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+          await walk(fullPath)
+        } else if (entry.isFile()) {
+          const ext = entry.name.slice(entry.name.lastIndexOf('.')).toLowerCase()
+          if (MD_EXT.has(ext)) {
+            results.push({ path: fullPath, name: entry.name })
+          }
+        }
+      }
+    } catch { /* skip inaccessible dirs */ }
+  }
+
+  await walk(folderPath)
+  return results.sort((a, b) => a.name.localeCompare(b.name))
+}
+

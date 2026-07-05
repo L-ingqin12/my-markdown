@@ -1,6 +1,8 @@
 export const IPC = {
   // File operations
   FILE_OPEN: 'file:open',
+  FOLDER_OPEN: 'folder:open',
+  FOLDER_SCAN: 'folder:scan',
   FILE_SAVE: 'file:save',
   FILE_SAVE_AS: 'file:save-as',
   FILE_READ: 'file:read',

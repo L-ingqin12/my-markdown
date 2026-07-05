@@ -80,6 +80,10 @@ export interface AiErrorData {
 const api = {
   // File operations
   openFile: (): Promise<FileResult | null> => ipcRenderer.invoke(IPC.FILE_OPEN),
+  openFolder: (): Promise<{ folderPath: string; files: Array<{ path: string; name: string }> } | null> =>
+    ipcRenderer.invoke(IPC.FOLDER_OPEN),
+  scanFolder: (folderPath: string): Promise<Array<{ path: string; name: string }>> =>
+    ipcRenderer.invoke(IPC.FOLDER_SCAN, folderPath),
   saveFile: (filePath: string, content: string): Promise<boolean> =>
     ipcRenderer.invoke(IPC.FILE_SAVE, filePath, content),
   saveFileAs: (content: string): Promise<string | null> =>

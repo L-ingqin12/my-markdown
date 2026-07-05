@@ -38,24 +38,18 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar styles */
+/* Ultra-thin scrollbar (~1mm / 3px) */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 3px;
+  height: 3px;
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 2px;
 }
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a0a0a0;
-}
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+::-webkit-scrollbar-corner { background: transparent; }
 
 /* App layout */
 .app-container {

@@ -1,9 +1,10 @@
 import {
   keymap, highlightSpecialChars, drawSelection, dropCursor,
   rectangularSelection, crosshairCursor, highlightActiveLine,
-  highlightActiveLineGutter, lineNumbers, EditorView
+  highlightActiveLineGutter, lineNumbers, EditorView,
+  ViewPlugin, ViewUpdate, Decoration, WidgetType
 } from '@codemirror/view'
-import { EditorState, Extension } from '@codemirror/state'
+import { EditorState, Extension, RangeSetBuilder } from '@codemirror/state'
 import {
   defaultHighlightStyle, syntaxHighlighting, indentOnInput,
   bracketMatching, foldGutter, foldKeymap
@@ -16,6 +17,71 @@ import { languages } from '@codemirror/language-data'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { GFM } from '@lezer/markdown'
 import { hybridMarkdown, lightTheme, darkTheme } from 'codemirror-markdown-hybrid'
+import katex from 'katex'
+
+// KaTeX math widget for inline/block math rendering
+class MathWidget extends WidgetType {
+  constructor(private formula: string, private displayMode: boolean) { super() }
+  toDOM(): HTMLElement {
+    const span = document.createElement('span')
+    span.className = 'cm-math-widget' + (this.displayMode ? ' cm-math-display' : '')
+    try {
+      katex.render(this.formula, span, {
+        displayMode: this.displayMode,
+        throwOnError: false,
+        trust: true
+      })
+    } catch {
+      span.textContent = this.formula
+    }
+    return span
+  }
+}
+
+// ViewPlugin that replaces $...$ and $$...$$ with rendered KaTeX widgets
+const mathPlugin = ViewPlugin.fromClass(class {
+  decorations: DecorationSet
+  constructor(view: EditorView) {
+    this.decorations = this.buildDecorations(view)
+  }
+  update(update: ViewUpdate) {
+    if (update.docChanged || update.viewportChanged) {
+      this.decorations = this.buildDecorations(update.view)
+    }
+  }
+  buildDecorations(view: EditorView): DecorationSet {
+    const builder = new RangeSetBuilder<Decoration>()
+    const doc = view.state.doc
+    const text = doc.toString()
+
+    // Block math: $$...$$ (multiline)
+    const blockRegex = /\$\$\n?([\s\S]*?)\n?\$\$/g
+    let match
+    while ((match = blockRegex.exec(text)) !== null) {
+      const from = match.index
+      const to = from + match[0].length
+      if (from === to) continue
+      builder.add(from, to, Decoration.replace({
+        widget: new MathWidget(match[1].trim(), true),
+        block: true
+      }))
+    }
+
+    // Inline math: $...$ (not $$)
+    const inlineRegex = /(?<!\$)\$(?!\$)([^$\n]+?)\$(?!\$)/g
+    while ((match = inlineRegex.exec(text)) !== null) {
+      const from = match.index
+      const to = from + match[0].length
+      if (from === to) continue
+      // Avoid overlapping with block matches
+      builder.add(from, to, Decoration.replace({
+        widget: new MathWidget(match[1].trim(), false)
+      }))
+    }
+
+    return builder.finish()
+  }
+}, { decorations: v => v.decorations })
 
 // Typora-style defaults: no line numbers, spacious content, clean layout
 export function buildExtensions(
@@ -71,6 +137,8 @@ export function buildExtensions(
       theme: isDark ? 'dark' : 'light',
       strict: false
     }),
+
+    mathPlugin,
 
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
 

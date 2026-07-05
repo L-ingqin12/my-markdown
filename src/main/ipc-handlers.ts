@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import { IPC } from '../shared/ipc-channels'
-import { openFileDialog, saveFile, saveFileAsDialog, readFileByPath, getRecentFiles } from './file-manager'
+import { openFileDialog, openFolderDialog, scanFolder, saveFile, saveFileAsDialog, readFileByPath, getRecentFiles } from './file-manager'
 import { getPreferences, setPreferences, getTheme, setTheme } from './preferences'
 import { uploadImages, getUploadConfig, setUploadConfig, testUpload } from './image-uploader'
 import { getThemeList, loadThemeCss, getCurrentTheme } from './theme-manager'
@@ -23,6 +23,14 @@ export function registerIpcHandlers(): void {
   // File operations
   ipcMain.handle(IPC.FILE_OPEN, async () => {
     return openFileDialog()
+  })
+
+  ipcMain.handle(IPC.FOLDER_OPEN, async () => {
+    return openFolderDialog()
+  })
+
+  ipcMain.handle(IPC.FOLDER_SCAN, async (_e, folderPath: string) => {
+    return scanFolder(folderPath)
   })
 
   ipcMain.handle(IPC.FILE_SAVE, async (_e, filePath: string, content: string) => {
