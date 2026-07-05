@@ -26,7 +26,9 @@ export function buildExtensions(
   const fontFamily = preferences?.fontFamily ?? "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif"
 
   return [
-    lineNumbers(),
+    ...(preferences?.showLineNumbers ? [lineNumbers({
+      formatNumber: (n: number) => String(n).padStart(4, ' ')
+    })] : []),
     highlightActiveLineGutter(),
     highlightSpecialChars(),
     drawSelection(),
@@ -93,20 +95,21 @@ export function buildExtensions(
       '&.cm-editor.cm-focused': { outline: 'none !important' },
       '.cm-scroller': {
         fontFamily,
-        lineHeight: '1.8',
+        lineHeight: '1.85',
         overflow: 'auto !important'
       },
       '.cm-content': {
-        padding: '3em 5em',
-        minHeight: '100%',
-        maxWidth: '900px',
+        padding: '4em 0',
+        maxWidth: '820px',
         margin: '0 auto'
       },
-      '.cm-line': { paddingLeft: '0', paddingRight: '0' },
+      '.cm-line': { padding: '0 2em', boxSizing: 'content-box' },
       '.cm-gutters': {
         borderRight: 'none',
         backgroundColor: 'transparent',
-        color: isDark ? '#555' : '#ccc'
+        color: isDark ? '#444' : '#ccc',
+        minWidth: '48px',
+        paddingRight: '12px'
       },
       '.cm-activeLineGutter': { backgroundColor: 'transparent' },
       '.cm-cursor': { borderLeftColor: isDark ? '#fff' : '#000' },
@@ -131,7 +134,9 @@ export function buildSourceExtensions(
   const fontSize = preferences?.fontSize ?? 16
 
   return [
-    lineNumbers(),
+    ...(preferences?.showLineNumbers ? [lineNumbers({
+      formatNumber: (n: number) => String(n).padStart(4, ' ')
+    })] : []),
     highlightActiveLineGutter(),
     highlightSpecialChars(),
     drawSelection(),
