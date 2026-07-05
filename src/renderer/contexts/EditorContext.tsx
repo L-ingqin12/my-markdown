@@ -91,7 +91,7 @@ const defaultPreferences: Preferences = {
   spellCheck: false
 }
 
-const EditorContext = createContext<EditorContextValue>({
+export const EditorContext = createContext<EditorContextValue>({
   content: '',
   setContent: () => {},
   filePath: null,

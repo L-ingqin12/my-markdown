@@ -21,7 +21,7 @@ export interface ChatContextValue {
   clearError: () => void
 }
 
-const ChatContext = createContext<ChatContextValue>({
+export const ChatContext = createContext<ChatContextValue>({
   conversations: [],
   activeConversationId: null,
   messages: [],

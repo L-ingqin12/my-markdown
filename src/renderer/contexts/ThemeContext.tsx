@@ -8,7 +8,7 @@ interface ThemeContextValue {
   refreshThemeList: () => Promise<void>
 }
 
-const ThemeContext = createContext<ThemeContextValue>({
+export const ThemeContext = createContext<ThemeContextValue>({
   theme: 'github',
   themeCss: '',
   themeList: [],
