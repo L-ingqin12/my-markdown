@@ -27,7 +27,7 @@ export function buildExtensions(
   const fontFamily = prefs?.fontFamily ?? "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif"
 
   return [
-    highlightActiveLineGutter(),
+    ...(prefs?.showLineNumbers ? [highlightActiveLineGutter()] : []),
     highlightSpecialChars(),
     drawSelection(),
     dropCursor(),
@@ -69,8 +69,9 @@ export function buildExtensions(
       strict: false
     }),
 
-    isDark ? darkTheme : lightTheme,
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+
+    // Hybrid theme first, then our custom overrides
 
     keymap.of([
       ...defaultKeymap,
@@ -83,7 +84,9 @@ export function buildExtensions(
     ]),
 
     ...(isDark ? [oneDark] : []),
+    isDark ? darkTheme : lightTheme,  // hybrid base theme goes first
 
+    // Custom overrides — loaded last = highest priority
     EditorView.theme({
       '&': {
         height: '100%',
@@ -96,12 +99,15 @@ export function buildExtensions(
       '.cm-scroller': {
         fontFamily,
         lineHeight: '1.7',
-        overflow: 'auto !important'
+        overflow: 'auto !important',
+        scrollbarGutter: 'stable',
+        width: '100%'
       },
       '.cm-content': {
         maxWidth: '860px',
         margin: '0 auto',
-        padding: '60px 0 40vh'
+        padding: '60px 0 40vh',
+        contain: 'layout'
       },
       '.cm-line': {
         padding: '0'
@@ -130,8 +136,18 @@ export function buildExtensions(
       '.cm-cursor': {
         borderLeftColor: isDark ? '#fff' : '#000'
       },
-      '.cm-selectionBackground, ::selection': {
-        backgroundColor: isDark ? '#3a3f4b' : '#b3d7ff'
+      '.cm-selectionBackground': {
+        backgroundColor: isDark ? 'rgba(55,148,255,0.4) !important' : 'rgba(0,120,215,0.25) !important'
+      },
+      '&.cm-focused .cm-selectionBackground': {
+        backgroundColor: isDark ? 'rgba(55,148,255,0.45) !important' : 'rgba(0,120,215,0.3) !important'
+      },
+      '.cm-selectionMatch': {
+        backgroundColor: isDark ? 'rgba(255,200,0,0.2)' : 'rgba(255,200,0,0.3)'
+      },
+      '.cm-cursor': {
+        borderLeftColor: isDark ? '#fff' : '#000',
+        borderLeftWidth: '2px'
       }
     }, { dark: isDark }),
 

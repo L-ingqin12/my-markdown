@@ -124,17 +124,26 @@ html, body, #root {
 }
 
 .app-sidebar {
-  width: 280px;
+  height: 100%;
   border-right: var(--window-border);
   background: var(--side-bar-bg-color);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  flex-shrink: 0;
 }
 
-.app-sidebar.hidden {
-  display: none;
+/* Sidebar resize handle (react-resizable-panels) */
+.sidebar-resize-handle {
+  width: 4px;
+  background: transparent;
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  z-index: 10;
+}
+.sidebar-resize-handle:hover,
+.sidebar-resize-handle[data-resize-handle-active] {
+  background: var(--primary-color);
 }
 
 /* Sidebar tabs */
