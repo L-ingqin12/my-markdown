@@ -169,13 +169,14 @@ export function buildExtensions(
       '.cm-scroller': {
         fontFamily,
         lineHeight: '1.7',
-        overflow: 'visible !important',
+        overflow: 'auto !important',
+        overflowX: 'hidden !important',
+        justifyContent: 'center !important',
         backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '.cm-content': {
         padding: '60px 0 40vh',
-        maxWidth: '860px',
-        margin: '0 auto',
+        maxWidth: '860px !important',
         backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '.cm-line': {
