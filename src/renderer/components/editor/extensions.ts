@@ -45,7 +45,7 @@ export function buildExtensions(
     ...(prefs?.showLineNumbers
       ? [
           lineNumbers({
-            formatNumber: n => String(n).padStart(4, ' ') // figure space = digit width
+            formatNumber: n => String(n).padStart(5, ' ')
           }),
           foldGutter()
         ]
@@ -107,13 +107,22 @@ export function buildExtensions(
         padding: '0'
       },
       '.cm-gutters': {
-        borderRight: 'none',
+        borderRight: 'none !important',
         backgroundColor: 'transparent',
         color: isDark ? '#555' : '#bbb',
         paddingRight: '8px',
-        minWidth: '52px',
-        fontFamily: "'SF Mono', 'Consolas', monospace",
+        minWidth: '60px !important',
+        width: '60px !important',
+        maxWidth: '60px !important',
+        fontFamily: '"Consolas", "SF Mono", "Cascadia Code", monospace',
+        fontVariantNumeric: 'tabular-nums',
         fontSize: '13px'
+      },
+      '.cm-lineNumbers .cm-gutterElement': {
+        fontFamily: '"Consolas", "SF Mono", "Cascadia Code", monospace',
+        fontVariantNumeric: 'tabular-nums',
+        textAlign: 'right',
+        padding: '0 6px 0 0 !important'
       },
       '.cm-activeLineGutter': {
         backgroundColor: 'transparent'
