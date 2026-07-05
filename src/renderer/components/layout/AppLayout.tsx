@@ -6,6 +6,7 @@ import { Sidebar } from './Sidebar'
 import { StatusBar } from './StatusBar'
 import { SearchPanel } from './SearchPanel'
 import { useEditor } from '../../contexts/EditorContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import { KanbanView } from '../kanban/KanbanView'
 import { MindMapView } from '../graph/MindMapView'
 import { KnowledgeGraph } from '../graph/KnowledgeGraph'
@@ -17,6 +18,7 @@ import { ChatPanel } from '../chat/ChatPanel'
 
 export function AppLayout() {
   const ctx = useEditor()
+  const themeCtx = useTheme()
 
   const editorContent = ctx.viewMode === 'kanban' ? (
     <KanbanView />
@@ -44,8 +46,8 @@ export function AppLayout() {
               <Sidebar
                 content={ctx.content}
                 visible={true}
-                onUploadConfig={() => ctx.setShowThemeDialog(true)}
-                onPreferences={() => ctx.setShowThemeDialog(true)}
+                onUploadConfig={() => ctx.setShowUploadConfig(true)}
+                onPreferences={() => ctx.setShowPreferences(true)}
               />
             </Panel>
             <Separator className="sidebar-resize-handle" />
@@ -65,11 +67,12 @@ export function AppLayout() {
       </div>
       <ChatPanel />
       <StatusBar
-        onUploadConfig={() => ctx.setShowThemeDialog(true)}
-        onPreferences={() => ctx.setShowThemeDialog(true)}
+        onUploadConfig={() => ctx.setShowUploadConfig(true)}
+        onPreferences={() => ctx.setShowPreferences(true)}
         onAbout={() => ctx.setShowAbout(true)}
       />
-      {ctx.showThemeDialog && <UploadConfig onClose={() => ctx.setShowThemeDialog(false)} />}
+      {ctx.showUploadConfig && <UploadConfig onClose={() => ctx.setShowUploadConfig(false)} />}
+      {ctx.showPreferences && <PreferencesDialog onClose={() => ctx.setShowPreferences(false)} />}
       {ctx.showAbout && <AboutDialog onClose={() => ctx.setShowAbout(false)} />}
     </>
   )

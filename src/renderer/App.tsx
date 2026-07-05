@@ -47,7 +47,7 @@ function AppInner() {
         case 'export:html': handleExportHtml(); break
         case 'export:pdf': handleExportPdf(); break
         case 'image:upload-all': uploadAllLocalImages(); break
-        case 'theme:select': ctx.setShowThemeDialog?.(true); break
+        case 'theme:select': ctx.setShowPreferences(true); break
         case 'help:about': ctx.setShowAbout?.(true); break
         case 'help:devtools':
           // DevTools is toggled via main process menu shortcut (F12)

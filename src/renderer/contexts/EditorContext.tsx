@@ -36,10 +36,14 @@ interface EditorContextValue {
   setShowThemeDialog: (v: boolean) => void
   showAbout: boolean
   setShowAbout: (v: boolean) => void
-  showExportResult: boolean
-  setShowExportResult: (v: boolean) => void
+  showPreferences: boolean
+  setShowPreferences: (v: boolean) => void
+  showUploadConfig: boolean
+  setShowUploadConfig: (v: boolean) => void
   viewMode: 'editor' | 'kanban' | 'mindmap' | 'graph'
   setViewMode: (mode: 'editor' | 'kanban' | 'mindmap' | 'graph') => void
+  cursorPos: { line: number; col: number }
+  setCursorPos: (pos: { line: number; col: number }) => void
 }
 
 export interface EditorHandle {
@@ -114,8 +118,14 @@ const EditorContext = createContext<EditorContextValue>({
   setShowAbout: () => {},
   showExportResult: false,
   setShowExportResult: () => {},
+  showPreferences: false,
+  setShowPreferences: () => {},
+  showUploadConfig: false,
+  setShowUploadConfig: () => {},
   viewMode: 'editor',
-  setViewMode: () => {}
+  setViewMode: () => {},
+  cursorPos: { line: 1, col: 1 },
+  setCursorPos: () => {}
 })
 
 export function EditorProvider({ children }: { children: React.ReactNode }) {
@@ -133,6 +143,9 @@ export function EditorProvider({ children }: { children: React.ReactNode }) {
   const [showThemeDialog, setShowThemeDialog] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [showExportResult, setShowExportResult] = useState(false)
+  const [showPreferences, setShowPreferences] = useState(false)
+  const [showUploadConfig, setShowUploadConfig] = useState(false)
+  const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 })
   const editorRef = useRef<EditorHandle | null>(null)
 
   React.useEffect(() => {
@@ -156,7 +169,10 @@ export function EditorProvider({ children }: { children: React.ReactNode }) {
       viewMode, setViewMode,
       showThemeDialog, setShowThemeDialog,
       showAbout, setShowAbout,
-      showExportResult, setShowExportResult
+      showExportResult, setShowExportResult,
+      showPreferences, setShowPreferences,
+      showUploadConfig, setShowUploadConfig,
+      cursorPos, setCursorPos
     }}>
       {children}
     </EditorContext.Provider>

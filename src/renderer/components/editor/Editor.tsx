@@ -13,10 +13,11 @@ interface EditorProps {
 const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMode = false }, ref) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
-  const {
-    content, setContent, setIsModified, setShowSearch,
-    preferences
-  } = useEditor()
+  const editorCtx = useEditor()
+  const { content, setContent, setIsModified, setShowSearch, preferences, setCursorPos } = editorCtx
+  const onCursorMove = useCallback((line: number, col: number) => {
+    setCursorPos({ line, col })
+  }, [setCursorPos])
   const { theme, themeCss } = useTheme()
   const isDark = theme.includes('dark') || theme.includes('night') || theme.includes('black')
 
@@ -52,7 +53,8 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
             setIsModified(true)
           },
           isDark,
-          preferences
+          preferences,
+          onCursorMove
         )
 
     const view = new EditorView({

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 import { Transformer } from 'markmap-lib'
 import { Markmap } from 'markmap-view'
 
@@ -7,6 +7,7 @@ interface MindMapViewProps {
 }
 
 export function MindMapView({ content }: MindMapViewProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const markmapRef = useRef<Markmap | null>(null)
 
@@ -15,7 +16,7 @@ export function MindMapView({ content }: MindMapViewProps) {
 
     try {
       const transformer = new Transformer()
-      const { root, features } = transformer.transform(content)
+      const { root } = transformer.transform(content)
 
       if (!markmapRef.current) {
         markmapRef.current = Markmap.create(svgRef.current, {
@@ -29,18 +30,23 @@ export function MindMapView({ content }: MindMapViewProps) {
     } catch (err) {
       console.error('MindMap render error:', err)
     }
-
-    return () => {
-      // Don't destroy on each content change, just update
-    }
   }, [content])
 
+  // ResizeObserver: re-fit when container size changes
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || !markmapRef.current) return
+
+    const observer = new ResizeObserver(() => {
+      markmapRef.current?.fit()
+    })
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <div style={{ width: '100%', height: '100%', minHeight: '400px' }}>
-      <svg
-        ref={svgRef}
-        style={{ width: '100%', height: '100%' }}
-      />
+    <div ref={containerRef} style={{ width: '100%', height: '100%', minHeight: '400px' }}>
+      <svg ref={svgRef} style={{ width: '100%', height: '100%' }} />
     </div>
   )
 }

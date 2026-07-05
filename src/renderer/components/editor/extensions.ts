@@ -21,7 +21,8 @@ import { hybridMarkdown, lightTheme, darkTheme } from 'codemirror-markdown-hybri
 export function buildExtensions(
   onChange: (content: string) => void,
   isDark: boolean,
-  prefs?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean }
+  prefs?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean },
+  onCursorMove?: (line: number, col: number) => void
 ): Extension[] {
   const fontSize = prefs?.fontSize ?? 18
   const fontFamily = prefs?.fontFamily ?? "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif"
@@ -126,14 +127,22 @@ export function buildExtensions(
         textAlign: 'right',
         padding: '0 6px 0 0 !important'
       },
+      '.cm-activeLine': {
+        backgroundColor: isDark ? 'rgba(255,255,255,0.04) !important' : 'rgba(0,0,0,0.02) !important'
+      },
       '.cm-activeLineGutter': {
         backgroundColor: 'transparent'
       },
+      // Override hybrid selectedLine dark flash
+      '.cm-selectedLine': {
+        backgroundColor: isDark ? 'rgba(255,255,255,0.06) !important' : 'rgba(0,0,0,0.03) !important',
+        color: 'inherit !important'
+      },
       '.cm-selectionBackground': {
-        backgroundColor: isDark ? 'rgba(55,148,255,0.4) !important' : 'rgba(0,120,215,0.25) !important'
+        backgroundColor: isDark ? 'rgba(55,148,255,0.5) !important' : 'rgba(0,120,215,0.35) !important'
       },
       '&.cm-focused .cm-selectionBackground': {
-        backgroundColor: isDark ? 'rgba(55,148,255,0.45) !important' : 'rgba(0,120,215,0.3) !important'
+        backgroundColor: isDark ? 'rgba(55,148,255,0.6) !important' : 'rgba(0,120,215,0.45) !important'
       },
       '.cm-selectionMatch': {
         backgroundColor: isDark ? 'rgba(255,200,0,0.2)' : 'rgba(255,200,0,0.3)'
@@ -147,6 +156,11 @@ export function buildExtensions(
     EditorView.updateListener.of(update => {
       if (update.docChanged) {
         onChange(update.state.doc.toString())
+      }
+      if (update.selectionSet && onCursorMove) {
+        const pos = update.state.selection.main.head
+        const line = update.state.doc.lineAt(pos)
+        onCursorMove(line.number, pos - line.from + 1)
       }
     })
   ]
