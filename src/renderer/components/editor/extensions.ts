@@ -17,18 +17,16 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { GFM } from '@lezer/markdown'
 import { hybridMarkdown, lightTheme, darkTheme } from 'codemirror-markdown-hybrid'
 
+// Typora-style defaults: no line numbers, spacious content, clean layout
 export function buildExtensions(
   onChange: (content: string) => void,
   isDark: boolean,
-  preferences?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean }
+  prefs?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean }
 ): Extension[] {
-  const fontSize = preferences?.fontSize ?? 16
-  const fontFamily = preferences?.fontFamily ?? "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif"
+  const fontSize = prefs?.fontSize ?? 18
+  const fontFamily = prefs?.fontFamily ?? "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif"
 
   return [
-    ...(preferences?.showLineNumbers ? [lineNumbers({
-      formatNumber: (n: number) => String(n).padStart(4, ' ')
-    })] : []),
     highlightActiveLineGutter(),
     highlightSpecialChars(),
     drawSelection(),
@@ -42,17 +40,23 @@ export function buildExtensions(
     closeBrackets(),
     autocompletion(),
     highlightSelectionMatches(),
-    foldGutter(),
     history(),
 
-    // Markdown language
+    ...(prefs?.showLineNumbers
+      ? [
+          lineNumbers({
+            formatNumber: n => String(n).padStart(4, ' ') // figure space = digit width
+          }),
+          foldGutter()
+        ]
+      : []),
+
     markdown({
       base: markdownLanguage,
       codeLanguages: languages,
       extensions: GFM
     }),
 
-    // WYSIWYG: hides markdown syntax, shows rendered content
     hybridMarkdown({
       renderHeadings: true,
       renderBoldItalic: true,
@@ -65,18 +69,14 @@ export function buildExtensions(
       strict: false
     }),
 
-    // Hybrid theme
     isDark ? darkTheme : lightTheme,
-
-    // Syntax highlighting
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
 
-    // Key bindings
     keymap.of([
       ...defaultKeymap,
       ...searchKeymap,
       ...historyKeymap,
-      ...foldKeymap,
+      ...(prefs?.showLineNumbers ? foldKeymap : []),
       ...completionKeymap,
       ...closeBracketsKeymap,
       indentWithTab
@@ -84,35 +84,43 @@ export function buildExtensions(
 
     ...(isDark ? [oneDark] : []),
 
-    // Editor appearance
     EditorView.theme({
       '&': {
         height: '100%',
         fontSize: `${fontSize}px`,
         backgroundColor: isDark ? '#282c34' : '#ffffff'
       },
-      '&.cm-editor': { outline: 'none !important' },
-      '&.cm-editor.cm-focused': { outline: 'none !important' },
+      '&.cm-editor, &.cm-editor.cm-focused': {
+        outline: 'none !important'
+      },
       '.cm-scroller': {
         fontFamily,
-        lineHeight: '1.85',
+        lineHeight: '1.7',
         overflow: 'auto !important'
       },
       '.cm-content': {
-        padding: '4em 0',
-        maxWidth: '820px',
-        margin: '0 auto'
+        maxWidth: '860px',
+        margin: '0 auto',
+        padding: '60px 0 40vh'
       },
-      '.cm-line': { padding: '0 2em', boxSizing: 'content-box' },
+      '.cm-line': {
+        padding: '0'
+      },
       '.cm-gutters': {
         borderRight: 'none',
         backgroundColor: 'transparent',
-        color: isDark ? '#444' : '#ccc',
-        minWidth: '48px',
-        paddingRight: '12px'
+        color: isDark ? '#555' : '#bbb',
+        paddingRight: '8px',
+        minWidth: '52px',
+        fontFamily: "'SF Mono', 'Consolas', monospace",
+        fontSize: '13px'
       },
-      '.cm-activeLineGutter': { backgroundColor: 'transparent' },
-      '.cm-cursor': { borderLeftColor: isDark ? '#fff' : '#000' },
+      '.cm-activeLineGutter': {
+        backgroundColor: 'transparent'
+      },
+      '.cm-cursor': {
+        borderLeftColor: isDark ? '#fff' : '#000'
+      },
       '.cm-selectionBackground, ::selection': {
         backgroundColor: isDark ? '#3a3f4b' : '#b3d7ff'
       }
@@ -129,14 +137,10 @@ export function buildExtensions(
 export function buildSourceExtensions(
   onChange: (content: string) => void,
   isDark: boolean,
-  preferences?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean }
+  prefs?: { fontSize?: number; fontFamily?: string; showLineNumbers?: boolean }
 ): Extension[] {
-  const fontSize = preferences?.fontSize ?? 16
-
   return [
-    ...(preferences?.showLineNumbers ? [lineNumbers({
-      formatNumber: (n: number) => String(n).padStart(4, ' ')
-    })] : []),
+    lineNumbers(),
     highlightActiveLineGutter(),
     highlightSpecialChars(),
     drawSelection(),
@@ -150,17 +154,26 @@ export function buildSourceExtensions(
     highlightSelectionMatches(),
     markdown({ base: markdownLanguage, codeLanguages: languages, extensions: GFM }),
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-    keymap.of([...defaultKeymap, ...searchKeymap, ...historyKeymap, ...foldKeymap, ...completionKeymap, ...closeBracketsKeymap, indentWithTab]),
+    keymap.of([
+      ...defaultKeymap, ...searchKeymap, ...historyKeymap,
+      ...foldKeymap, ...completionKeymap, ...closeBracketsKeymap, indentWithTab
+    ]),
     ...(isDark ? [oneDark] : []),
     EditorView.theme({
       '&': {
         height: '100%',
-        fontSize: `${fontSize}px`,
-        fontFamily: "'Consolas', 'Fira Code', 'JetBrains Mono', monospace"
+        fontSize: `${prefs?.fontSize ?? 15}px`,
+        fontFamily: "'Consolas', 'Fira Code', 'JetBrains Mono', monospace",
+        backgroundColor: isDark ? '#1e1e1e' : '#ffffff'
       },
-      '.cm-content': { padding: '2em 3em', minHeight: '100%' },
-      '.cm-line': { paddingLeft: '0', paddingRight: '0' },
-      '&.cm-editor.cm-focused': { outline: 'none' }
+      '&.cm-editor, &.cm-editor.cm-focused': { outline: 'none' },
+      '.cm-content': { padding: '20px 0', maxWidth: '960px', margin: '0 auto' },
+      '.cm-line': { padding: '0 8px' },
+      '.cm-gutters': {
+        borderRight: '1px solid ' + (isDark ? '#333' : '#ddd'),
+        backgroundColor: isDark ? '#252526' : '#f5f5f5',
+        color: isDark ? '#858585' : '#999'
+      }
     }, { dark: isDark }),
     EditorView.updateListener.of(update => {
       if (update.docChanged) {

@@ -311,38 +311,17 @@ html, body, #root {
   position: relative;
 }
 
-/* CodeMirror overrides - single scrollbar fix */
-.editor-container .cm-editor {
-  height: 100%;
-  outline: none !important;
-}
-
-.editor-container .cm-editor .cm-scroller {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  height: 100% !important;
-}
-
-/* Editor scrollbar styling */
-.editor-container .cm-editor .cm-scroller::-webkit-scrollbar {
-  width: 8px;
-}
-.editor-container .cm-editor .cm-scroller::-webkit-scrollbar-track {
-  background: transparent;
-}
-.editor-container .cm-editor .cm-scroller::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-/* WYSIWYG rendering: hide markdown syntax markers */
-.cm-wysiwyg-hidden {
-  display: inline-block;
-  width: 0;
+/* Editor area — CM6 handles its own layout; only constrain the container */
+.editor-container {
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
+  position: relative;
 }
+
+.editor-container .cm-editor .cm-scroller::-webkit-scrollbar { width: 8px; }
+.editor-container .cm-editor .cm-scroller::-webkit-scrollbar-track { background: transparent; }
+.editor-container .cm-editor .cm-scroller::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
 
 /* Typora-compatible classes */
 .md-fences {
