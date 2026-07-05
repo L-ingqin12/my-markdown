@@ -130,24 +130,27 @@ export function buildExtensions(
         padding: '0 6px 0 0 !important'
       },
       '.cm-activeLine': {
-        backgroundColor: isDark ? 'rgba(255,255,255,0.04) !important' : 'rgba(0,0,0,0.02) !important'
+        backgroundColor: isDark ? 'rgba(255,255,255,0.06) !important' : 'rgba(0,0,0,0.02) !important'
       },
       '.cm-activeLineGutter': {
         backgroundColor: 'transparent'
       },
-      // Override hybrid selectedLine dark flash
       '.cm-selectedLine': {
-        backgroundColor: isDark ? 'rgba(255,255,255,0.06) !important' : 'rgba(0,0,0,0.03) !important',
+        backgroundColor: isDark ? 'rgba(255,255,255,0.08) !important' : 'rgba(0,0,0,0.03) !important',
         color: 'inherit !important'
       },
+      // High-contrast selection — guaranteed visible on any background
       '.cm-selectionBackground': {
-        backgroundColor: isDark ? 'rgba(55,148,255,0.5) !important' : 'rgba(0,120,215,0.35) !important'
+        backgroundColor: isDark ? '#264f78 !important' : '#cce5ff !important',
+        outline: isDark ? '1px solid rgba(86,156,214,0.8)' : '1px solid rgba(0,120,215,0.4)',
+        borderRadius: '2px'
       },
       '&.cm-focused .cm-selectionBackground': {
-        backgroundColor: isDark ? 'rgba(55,148,255,0.6) !important' : 'rgba(0,120,215,0.45) !important'
+        backgroundColor: isDark ? '#264f78 !important' : '#b3d9ff !important',
+        outline: isDark ? '1px solid rgba(86,156,214,0.8)' : '1px solid rgba(0,120,215,0.5)'
       },
       '.cm-selectionMatch': {
-        backgroundColor: isDark ? 'rgba(255,200,0,0.2)' : 'rgba(255,200,0,0.3)'
+        backgroundColor: isDark ? 'rgba(255,200,0,0.3)' : 'rgba(255,200,0,0.4)'
       },
       '.cm-cursor': {
         borderLeftColor: isDark ? '#fff' : '#000',
