@@ -919,6 +919,28 @@ pre.md-meta-block {
   color: #666;
 }
 
+/* File info (Typora-style) */
+.file-info-panel {
+  padding: 12px 16px;
+  border-bottom: var(--window-border);
+  font-size: 12px;
+}
+.file-info-section { margin-bottom: 10px; }
+.file-info-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+.file-info-filename { font-size: 16px; font-weight: 600; color: var(--text-color); }
+.file-info-path { font-size: 11px; color: #888; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-info-stats { display: flex; gap: 16px; }
+.file-info-stat { text-align: center; }
+.file-info-stat-value { display: block; font-size: 18px; font-weight: 600; color: var(--text-color); }
+.file-info-stat-label { display: block; font-size: 10px; color: #aaa; }
+.file-info-unsaved { padding: 8px; background: #fff3cd; border-radius: 4px; color: #856404; text-align: center; margin-top: 8px; }
+
 /* Search panel (Typora-style overlay) */
 .search-panel-overlay {
   position: absolute;

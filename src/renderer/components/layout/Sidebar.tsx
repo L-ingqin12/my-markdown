@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Outline } from './Outline'
 import { FileTree } from './FileTree'
+import { FileInfo } from './FileInfo'
 import { TagPanel } from './TagPanel'
 import { useEditor } from '../../contexts/EditorContext'
 import { extractTags } from '../../utils/wikilink'
@@ -56,10 +57,13 @@ export function Sidebar({ content, visible, onUploadConfig, onPreferences }: Sid
       {/* Tab content */}
       <div className="sidebar-content">
         {activeTab === 'files' && (
-          <FileTree
-            onFileClick={handleFileClick}
-            activeFile={ctx.filePath}
-          />
+          <>
+            <FileInfo />
+            <FileTree
+              onFileClick={handleFileClick}
+              activeFile={ctx.filePath}
+            />
+          </>
         )}
 
         {activeTab === 'outline' && (
