@@ -92,7 +92,7 @@ export function buildExtensions(
       '&': {
         height: '100%',
         fontSize: `${fontSize}px`,
-        backgroundColor: isDark ? '#282c34' : '#ffffff'
+        backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '&.cm-editor, &.cm-editor.cm-focused': {
         outline: 'none !important'
@@ -101,10 +101,12 @@ export function buildExtensions(
         fontFamily,
         lineHeight: '1.7',
         overflow: 'auto !important',
-        overflowX: 'hidden !important'
+        overflowX: 'hidden !important',
+        backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '.cm-content': {
-        padding: '60px 0 40vh'
+        padding: '60px 0 40vh',
+        backgroundColor: isDark ? '#282c34' : '#ffffff !important'
       },
       '.cm-line': {
         padding: '0'
