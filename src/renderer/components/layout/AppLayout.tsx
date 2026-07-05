@@ -1,5 +1,5 @@
 import React from 'react'
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
+import { Panel, Group, Separator } from 'react-resizable-panels'
 import Editor from '../editor/Editor'
 import { EditorToolbar } from '../editor/EditorToolbar'
 import { Sidebar } from './Sidebar'
@@ -39,8 +39,8 @@ export function AppLayout() {
       <EditorToolbar />
       <div className="app-body">
         {ctx.sidebarVisible ? (
-          <PanelGroup direction="horizontal" autoSaveId="sidebar-width">
-            <Panel defaultSize={18} minSize={12} maxSize={35}>
+          <Group direction="horizontal">
+            <Panel defaultSize="20%" minSize="15%" maxSize="35%">
               <Sidebar
                 content={ctx.content}
                 visible={true}
@@ -48,14 +48,14 @@ export function AppLayout() {
                 onPreferences={() => ctx.setShowThemeDialog(true)}
               />
             </Panel>
-            <PanelResizeHandle className="sidebar-resize-handle" />
-            <Panel defaultSize={82} minSize={50}>
+            <Separator className="sidebar-resize-handle" />
+            <Panel defaultSize="80%" minSize="50%">
               <div className="app-editor-area">
                 {editorContent}
                 {ctx.showSearch && ctx.viewMode === 'editor' && <SearchPanel />}
               </div>
             </Panel>
-          </PanelGroup>
+          </Group>
         ) : (
           <div className="app-editor-area" style={{ width: '100%' }}>
             {editorContent}
