@@ -12,6 +12,7 @@ import { MindMapView } from '../graph/MindMapView'
 import { KnowledgeGraph } from '../graph/KnowledgeGraph'
 import { WelcomeScreen } from './WelcomeScreen'
 import { PreferencesDialog } from '../dialogs/PreferencesDialog'
+import { ThemeDialog } from '../dialogs/ThemeDialog'
 import { AboutDialog } from '../dialogs/AboutDialog'
 import { UploadConfig } from '../upload/UploadConfig'
 import { ChatPanel } from '../chat/ChatPanel'
@@ -70,7 +71,9 @@ export function AppLayout() {
         onUploadConfig={() => ctx.setShowUploadConfig(true)}
         onPreferences={() => ctx.setShowPreferences(true)}
         onAbout={() => ctx.setShowAbout(true)}
+        onThemeDialog={() => ctx.setShowThemeDialog(true)}
       />
+      {ctx.showThemeDialog && <ThemeDialog onClose={() => ctx.setShowThemeDialog(false)} />}
       {ctx.showUploadConfig && <UploadConfig onClose={() => ctx.setShowUploadConfig(false)} />}
       {ctx.showPreferences && <PreferencesDialog onClose={() => ctx.setShowPreferences(false)} />}
       {ctx.showAbout && <AboutDialog onClose={() => ctx.setShowAbout(false)} />}
