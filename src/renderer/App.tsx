@@ -24,13 +24,12 @@ function AppInner() {
     const cleanup = window.api.onMenuAction((action: string) => {
       switch (action) {
         case 'file:new':
-          ctx.setContent('')
-          ctx.setFilePath(null)
-          ctx.setFileName('Untitled')
-          ctx.setIsModified(false)
+          ctx.setContent(''); ctx.setFilePath(null)
+          ctx.setFileName('Untitled'); ctx.setIsModified(false)
           window.api.setTitle('My Markdown - Untitled')
           break
         case 'file:open': openFile(); break
+        case 'file:open-folder': ctx.setSidebarVisible(true); break
         case 'file:save':
           if (ctx.filePath) saveFile()
           else saveFileAs()
