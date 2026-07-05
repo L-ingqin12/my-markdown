@@ -12,11 +12,12 @@ interface SidebarProps {
   visible: boolean
   onUploadConfig: () => void
   onPreferences: () => void
+  onAiSettings?: () => void
 }
 
 type TabId = 'files' | 'search' | 'outline' | 'tags' | 'settings'
 
-export function Sidebar({ content, visible, onUploadConfig, onPreferences }: SidebarProps) {
+export function Sidebar({ content, visible, onUploadConfig, onPreferences, onAiSettings }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabId>('files')
   const ctx = useEditor()
 
@@ -87,6 +88,11 @@ export function Sidebar({ content, visible, onUploadConfig, onPreferences }: Sid
             <div className="sidebar-menu-item" onClick={onUploadConfig}>
               <span>🖼</span> Image Upload Settings
             </div>
+            {onAiSettings && (
+              <div className="sidebar-menu-item" onClick={onAiSettings}>
+                <span>🤖</span> AI Provider Settings
+              </div>
+            )}
             <div className="sidebar-menu-item" onClick={onPreferences}>
               <span>⚙</span> Preferences
             </div>

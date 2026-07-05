@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Editor from '../editor/Editor'
 import { EditorToolbar } from '../editor/EditorToolbar'
 import { Sidebar } from './Sidebar'
@@ -14,11 +14,13 @@ import { PreferencesDialog } from '../dialogs/PreferencesDialog'
 import { ThemeDialog } from '../dialogs/ThemeDialog'
 import { AboutDialog } from '../dialogs/AboutDialog'
 import { UploadConfig } from '../upload/UploadConfig'
+import { ProviderConfigDialog } from '../chat/ProviderConfigDialog'
 import { ChatPanel } from '../chat/ChatPanel'
 
 export function AppLayout() {
   const ctx = useEditor()
   const themeCtx = useTheme()
+  const [showAiSettings, setShowAiSettings] = useState(false)
 
   const editorContent = ctx.viewMode === 'kanban' ? (
     <KanbanView />
@@ -46,6 +48,7 @@ export function AppLayout() {
             visible={true}
             onUploadConfig={() => ctx.setShowUploadConfig(true)}
             onPreferences={() => ctx.setShowPreferences(true)}
+            onAiSettings={() => setShowAiSettings(true)}
           />
         )}
         <div
@@ -67,6 +70,7 @@ export function AppLayout() {
       {ctx.showUploadConfig && <UploadConfig onClose={() => ctx.setShowUploadConfig(false)} />}
       {ctx.showPreferences && <PreferencesDialog onClose={() => ctx.setShowPreferences(false)} />}
       {ctx.showAbout && <AboutDialog onClose={() => ctx.setShowAbout(false)} />}
+      {showAiSettings && <ProviderConfigDialog onClose={() => setShowAiSettings(false)} />}
     </>
   )
 }
