@@ -33,6 +33,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const loadTheme = useCallback(async (name: string) => {
     try {
       let css = await window.api.loadThemeCss(name)
+      // Strip layout-breaking properties that conflict with our editor
+      css = css.replace(/column-count\s*:\s*[^;!}]+[!;]/gi, 'column-count: 1 !important;')
+               .replace(/column-width\s*:\s*[^;!}]+[!;]/gi, 'column-width: auto !important;')
+               .replace(/column-gap\s*:\s*[^;!}]+[!;]/gi, 'column-gap: normal;')
       // Scope all theme CSS to #write to prevent leaking into toolbar/sidebar
       css = `@scope (#write) {\n${css}\n}`
       setThemeCss(css)
