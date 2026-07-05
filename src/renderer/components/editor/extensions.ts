@@ -104,10 +104,10 @@ export function buildExtensions(
         width: '100%'
       },
       '.cm-content': {
-        maxWidth: '860px',
+        width: 'min(860px, 100%)',
         margin: '0 auto',
         padding: '60px 0 40vh',
-        contain: 'layout'
+        contain: 'layout style'
       },
       '.cm-line': {
         padding: '0'
@@ -132,9 +132,6 @@ export function buildExtensions(
       },
       '.cm-activeLineGutter': {
         backgroundColor: 'transparent'
-      },
-      '.cm-cursor': {
-        borderLeftColor: isDark ? '#fff' : '#000'
       },
       '.cm-selectionBackground': {
         backgroundColor: isDark ? 'rgba(55,148,255,0.4) !important' : 'rgba(0,120,215,0.25) !important'
