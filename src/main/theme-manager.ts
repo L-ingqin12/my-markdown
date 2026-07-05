@@ -25,15 +25,42 @@ function cssNameToDisplay(filename: string): string {
 
 async function scanThemesDir(dir: string, isBuiltin: boolean): Promise<string[]> {
   if (!existsSync(dir)) return []
-  const files = await readdir(dir)
-  return files
-    .filter(f => extname(f) === '.css' && !f.endsWith('.user.css'))
-    .map(f => join(dir, f))
+  const entries = await readdir(dir, { withFileTypes: true })
+  const results: string[] = []
+
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      // Scan one level deep for themes in subdirectories
+      try {
+        const subEntries = await readdir(fullPath, { withFileTypes: true })
+        for (const sub of subEntries) {
+          if (sub.isFile() && extname(sub.name) === '.css' && !sub.name.endsWith('.user.css')) {
+            results.push(join(fullPath, sub.name))
+          }
+        }
+      } catch { /* skip inaccessible dirs */ }
+    } else if (entry.isFile() && extname(entry.name) === '.css' && !entry.name.endsWith('.user.css')) {
+      results.push(fullPath)
+    }
+  }
+  return results
 }
 
 export async function getThemeList(): Promise<{ name: string; displayName: string; isBuiltin: boolean }[]> {
-  const builtinFiles = await scanThemesDir(BUILTIN_THEMES_DIR, true)
-  const userFiles = await scanThemesDir(USER_THEMES_DIR, false)
+  let builtinFiles: string[] = []
+  let userFiles: string[] = []
+
+  try { builtinFiles = await scanThemesDir(BUILTIN_THEMES_DIR, true) } catch {}
+  try { userFiles = await scanThemesDir(USER_THEMES_DIR, false) } catch {}
+
+  // Fallback: if no themes found, add built-in defaults
+  if (builtinFiles.length === 0 && userFiles.length === 0) {
+    return [
+      { name: 'github', displayName: 'Github (Light)', isBuiltin: true },
+      { name: 'night', displayName: 'Night (Dark)', isBuiltin: true }
+    ]
+  }
 
   const all = [
     ...builtinFiles.map(f => ({ path: f, isBuiltin: true })),

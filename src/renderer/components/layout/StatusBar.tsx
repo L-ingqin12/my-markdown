@@ -24,13 +24,20 @@ export function StatusBar({ onUploadConfig, onPreferences, onAbout }: StatusBarP
       </div>
       <div className="status-right">
         <select
-          className="status-item"
+          className="status-item theme-select"
           value={theme}
           onChange={(e) => setTheme(e.target.value)}
+          title="Select theme (also Ctrl+Shift+T)"
           style={{
-            border: 'none', background: 'transparent',
-            fontSize: '12px', color: '#888', cursor: 'pointer',
-            fontFamily: 'inherit'
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            background: 'var(--bg-color)',
+            fontSize: '12px',
+            color: 'var(--text-color)',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            padding: '1px 4px',
+            minWidth: '120px'
           }}
         >
           {themeList.map(t => (
