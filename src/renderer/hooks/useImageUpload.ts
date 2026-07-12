@@ -21,8 +21,8 @@ export function useImageUpload() {
       }
       setUploadProgress(`Uploaded ${urls.length} image(s) successfully`)
       setTimeout(() => setUploadProgress(''), 3000)
-    } catch (err: any) {
-      setUploadProgress(`Upload failed: ${err.message}`)
+    } catch (err: unknown) {
+      setUploadProgress(`Upload failed: ${err instanceof Error ? err.message : String(err)}`)
       setTimeout(() => setUploadProgress(''), 5000)
     } finally {
       setUploading(false)
@@ -61,8 +61,8 @@ export function useImageUpload() {
       editorRef.current?.setContent(newContent)
       setUploadProgress(`Replaced ${urls.length} local image(s) with remote URLs`)
       setTimeout(() => setUploadProgress(''), 3000)
-    } catch (err: any) {
-      setUploadProgress(`Upload all failed: ${err.message}`)
+    } catch (err: unknown) {
+      setUploadProgress(`Upload all failed: ${err instanceof Error ? err.message : String(err)}`)
       setTimeout(() => setUploadProgress(''), 5000)
     } finally {
       setUploading(false)

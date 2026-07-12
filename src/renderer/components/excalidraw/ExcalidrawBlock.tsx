@@ -54,9 +54,12 @@ export function ExcalidrawBlock({ blockId, sceneData, onUpdate }: ExcalidrawBloc
         files,
         mimeType: 'image/png'
       })
-      const buffer = await blob.arrayBuffer()
-      await window.api.exportPdf('', '') // using for file save, stub
-      // In a real implementation, use a proper save dialog
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'drawing.png'
+      a.click()
+      URL.revokeObjectURL(url)
     } catch (err) {
       console.error('Export PNG failed:', err)
     }

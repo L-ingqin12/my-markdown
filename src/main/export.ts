@@ -153,16 +153,22 @@ export async function exportPdf(
     webPreferences: { sandbox: true },
   })
 
-  await pdfWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`)
+  try {
+    await pdfWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`)
 
-  const pdfData = await pdfWin.webContents.printToPDF({
-    printBackground: true,
-    preferCSSPageSize: true,
-    margins: { marginType: 'custom' as const, top: 15, bottom: 15, left: 15, right: 15 },
-  })
+    const pdfData = await pdfWin.webContents.printToPDF({
+      printBackground: true,
+      preferCSSPageSize: true,
+      margins: { marginType: 'custom' as const, top: 15, bottom: 15, left: 15, right: 15 },
+    })
 
-  await writeFile(savePath, pdfData)
-  pdfWin.close()
+    await writeFile(savePath, pdfData)
+  } catch (err) {
+    console.error('PDF export failed:', err)
+    return null
+  } finally {
+    pdfWin.close()
+  }
   return savePath
 }
 

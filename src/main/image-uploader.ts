@@ -257,7 +257,11 @@ async function uploadViaGithub(imagePaths: string[], config: UploadConfig): Prom
         branch: githubBranch
       })
       const retryResult = await postGitHub(githubRepo!, githubToken!, uniqueName, retryBody)
-      results.push(`https://raw.githubusercontent.com/${githubRepo}/${githubBranch}/${uniqueName}`)
+      if (retryResult) {
+        results.push(`https://raw.githubusercontent.com/${githubRepo}/${githubBranch}/${uniqueName}`)
+      } else {
+        results.push(imgPath)
+      }
     }
   }
   return results

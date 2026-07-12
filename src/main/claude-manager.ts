@@ -21,6 +21,17 @@ interface InstanceEntry {
 export class ClaudeManager extends EventEmitter {
   private instances = new Map<string, InstanceEntry>()
 
+  private emitSystemStatus() {
+    const runningInstances = this.instances.size
+    this.emit('system-status', {
+      availableSlots: Math.max(0, 5 - runningInstances),
+      runningInstances,
+      maxInstances: 5,
+      canAcceptWork: runningInstances < 5,
+      reason: runningInstances >= 5 ? 'Max instances reached' : 'Ready'
+    })
+  }
+
   spawnInstance(conversationId: string): ClaudeInstanceInfo {
     const id = crypto.randomUUID()
     const child = spawn('claude', [], {
@@ -56,6 +67,7 @@ export class ClaudeManager extends EventEmitter {
       info.status = code === 0 ? 'idle' : 'error'
       this.instances.delete(id)
       this.emit('exited', id, { code, signal })
+      this.emitSystemStatus()
     })
 
     child.on('error', (err) => {
@@ -63,6 +75,7 @@ export class ClaudeManager extends EventEmitter {
       this.emit('spawn-error', id, err.message)
     })
 
+    this.emitSystemStatus()
     return info
   }
 
@@ -80,6 +93,7 @@ export class ClaudeManager extends EventEmitter {
     if (!entry) return false
     entry.process.kill()
     this.instances.delete(instanceId)
+    this.emitSystemStatus()
     return true
   }
 

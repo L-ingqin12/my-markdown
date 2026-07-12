@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 
 interface ThemeContextValue {
   theme: string
@@ -56,8 +56,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     init()
   }, [loadTheme, refreshThemeList])
 
+  const themeValue = useMemo(() => ({
+      theme, themeCss, themeList, setTheme, refreshThemeList
+    }), [theme, themeCss, themeList, setTheme, refreshThemeList])
+
   return (
-    <ThemeContext.Provider value={{ theme, themeCss, themeList, setTheme, refreshThemeList }}>
+    <ThemeContext.Provider value={themeValue}>
       {children}
     </ThemeContext.Provider>
   )

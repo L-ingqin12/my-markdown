@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 
 interface SystemStatus {
   availableSlots: number
@@ -91,11 +91,14 @@ export function ClaudeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  return (
-    <ClaudeContext.Provider value={{
+  const claudeValue = useMemo(() => ({
       instances, systemStatus, queueDepth,
       spawnConversation, sendMessage, killConversation
-    }}>
+    }), [instances, systemStatus, queueDepth,
+        spawnConversation, sendMessage, killConversation])
+
+  return (
+    <ClaudeContext.Provider value={claudeValue}>
       {children}
     </ClaudeContext.Provider>
   )

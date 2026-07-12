@@ -15,8 +15,13 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
   const viewRef = useRef<EditorView | null>(null)
   const editorCtx = useEditor()
   const { content, setContent, setIsModified, setShowSearch, preferences, setCursorPos, typewriterMode } = editorCtx
+  const lastCursorUpdate = useRef(0)
   const onCursorMove = useCallback((line: number, col: number) => {
-    setCursorPos({ line, col })
+    const now = Date.now()
+    if (now - lastCursorUpdate.current >= 200) {
+      lastCursorUpdate.current = now
+      setCursorPos({ line, col })
+    }
   }, [setCursorPos])
   const { theme, themeCss } = useTheme()
   const isDark = theme.includes('dark') || theme.includes('night') || theme.includes('black')
@@ -230,26 +235,34 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ sourceMod
         const done = await new Promise<void>((resolve) => {
           const unsubDone = window.api.onAiDone((data: any) => {
             if (data.conversationId === convId) {
+              clearTimeout(timeout)
               unsubDone()
               resolve()
             }
           })
           const unsubErr = window.api.onAiError((data: any) => {
             if (data.conversationId === convId) {
+              clearTimeout(timeout)
               unsubDone()
               unsubErr()
               accumulated = '**Error:** ' + data.error
               resolve()
             }
           })
+          const timeout = setTimeout(() => {
+            unsubDone()
+            unsubErr()
+            accumulated = '**Error:** Request timed out after 120 seconds'
+            resolve()
+          }, 120000)
         })
 
         unsubChunk()
         // Final update with complete response
         updateResponseBlock(viewRef.current, blockEnd, accumulated)
 
-      } catch (err: any) {
-        const errText = '**Error:** ' + (err.message || 'Unknown error')
+      } catch (err: unknown) {
+        const errText = '**Error:** ' + (err instanceof Error ? err.message : String(err))
         updateResponseBlock(viewRef.current, blockEnd, errText)
       }
     },

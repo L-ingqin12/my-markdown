@@ -203,4 +203,10 @@ export function registerIpcHandlers(): void {
   claudeManager.on('exited', (instanceId: string, info: Record<string, unknown>) => {
     BrowserWindow.getAllWindows().forEach(w => w.webContents.send(IPC.CLAUDE_EXITED, instanceId, info))
   })
+  claudeManager.on('system-status', (status: Record<string, unknown>) => {
+    BrowserWindow.getAllWindows().forEach(w => w.webContents.send(IPC.CLAUDE_SYSTEM_STATUS, status))
+  })
+  convQueue.on('queue-depth', (depth: number) => {
+    BrowserWindow.getAllWindows().forEach(w => w.webContents.send(IPC.CLAUDE_QUEUE_STATUS, depth))
+  })
 }

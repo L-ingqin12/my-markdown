@@ -1,4 +1,5 @@
-import type { ElectronAPI, AIProviderConfig, ConversationMeta, ChatMessage, AiChunkData, AiDoneData, AiErrorData } from '../../preload/index'
+import type { ElectronAPI } from '../../preload/index'
+import type { AIProviderConfig, ConversationMeta, ChatMessage, AiChunkData, AiDoneData, AiErrorData } from '../../shared/types'
 
 declare global {
   interface Window {

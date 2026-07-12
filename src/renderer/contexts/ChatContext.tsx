@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react'
-import type { ConversationMeta, ChatMessage } from '../../preload/index'
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react'
+import type { ConversationMeta, ChatMessage } from '../../shared/types'
 
 export interface ChatContextValue {
   conversations: ConversationMeta[]
@@ -86,7 +86,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     const removeDone = window.api.onAiDone((data) => {
       if (data.conversationId === activeConvIdRef.current) {
         if (data.content) {
-          setMessages(prev => [...prev, { role: 'assistant', content: data.content }])
+          setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: data.content }])
         }
         setStreamingContent('')
         streamingRef.current = false
@@ -122,7 +122,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setStreamingContent('')
 
     // Add user message immediately
-    const userMessage: ChatMessage = { role: 'user', content: content.trim() }
+    const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: content.trim() }
     setMessages(prev => [...prev, userMessage])
 
     try {
@@ -177,7 +177,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       if (result.success && result.conversation) {
         setActiveConversationId(id)
         activeConvIdRef.current = id
-        setMessages(result.messages)
+        setMessages(result.messages.map((m: ChatMessage) => m.id ? m : { ...m, id: crypto.randomUUID() }))
         setStreamingContent('')
         setError(null)
         setIsOpen(true)
@@ -208,8 +208,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setIsOpen(prev => !prev)
   }, [])
 
-  return (
-    <ChatContext.Provider value={{
+  const chatValue = useMemo(() => ({
       conversations,
       activeConversationId,
       messages,
@@ -227,7 +226,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       setPanelHeight,
       refreshConversations,
       clearError
-    }}>
+    }), [conversations, activeConversationId, messages, isStreaming, streamingContent,
+        isOpen, panelHeight, error, sendMessage, stopStreaming, newConversation,
+        switchConversation, deleteConversation, togglePanel, setPanelHeight,
+        refreshConversations, clearError])
+
+  return (
+    <ChatContext.Provider value={chatValue}>
       {children}
     </ChatContext.Provider>
   )

@@ -93,7 +93,13 @@ app.whenReady().then(() => {
 
 // Single instance lock for file association
 const gotLock = app.requestSingleInstanceLock()
-if (!gotLock) { app.quit() }
+if (!gotLock) {
+  if (app.isReady()) {
+    app.quit()
+  } else {
+    app.once('ready', () => app.quit())
+  }
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

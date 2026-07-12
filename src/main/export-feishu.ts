@@ -170,67 +170,108 @@ function getFeishuLang(lang: string): number {
 
 function parseInlineStyles(line: string): FeishuInline[] {
   const inlines: FeishuInline[] = []
-  // We process **bold**, *italic*, ~~strikethrough~~, `code`, [text](url) inline.
-  // Use a simple regex‑based tokenizer that respects nesting.
+  // State-machine parser using a stack to handle nested styles.
+  // Tracks open/close markers for bold (**), italic (*), code (`), strikethrough (~~).
+  const stack: string[] = []
+  let buf = ''
+  let i = 0
 
-  const tokenPattern =
-    /(\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|\*(.+?)\*|~~(.+?)~~|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\))/g
-
-  let lastIndex = 0
-  let match: RegExpExecArray | null
-
-  while ((match = tokenPattern.exec(line)) !== null) {
-    // Push plain text before this match
-    if (match.index > lastIndex) {
-      const plain = line.slice(lastIndex, match.index)
-      inlines.push({ content: plain, text_element_style: {} })
+  function currentStyle(): FeishuTextStyle {
+    return {
+      bold: stack.includes('bold'),
+      italic: stack.includes('italic'),
+      strikethrough: stack.includes('strike'),
     }
-
-    if (match[1]?.startsWith('***')) {
-      // Bold + italic
-      inlines.push({
-        content: match[2],
-        text_element_style: { bold: true, italic: true },
-      })
-    } else if (match[1]?.startsWith('**')) {
-      inlines.push({
-        content: match[3],
-        text_element_style: { bold: true },
-      })
-    } else if (match[1]?.startsWith('*')) {
-      inlines.push({
-        content: match[4],
-        text_element_style: { italic: true },
-      })
-    } else if (match[1]?.startsWith('~~')) {
-      inlines.push({
-        content: match[5],
-        text_element_style: { strikethrough: true },
-      })
-    } else if (match[1]?.startsWith('`')) {
-      inlines.push({
-        content: match[6],
-        text_element_style: { inline_code: true },
-      })
-    } else if (match[1]?.startsWith('[')) {
-      // Markdown link [text](url)
-      inlines.push({
-        content: match[7],
-        link: { url: match[8] },
-        text_element_style: {},
-      })
-    }
-
-    lastIndex = match.index + match[0].length
   }
 
-  // Remaining text
-  if (lastIndex < line.length) {
-    inlines.push({
-      content: line.slice(lastIndex),
-      text_element_style: {},
-    })
+  function flush() {
+    if (buf) {
+      inlines.push({ content: buf, text_element_style: currentStyle() })
+      buf = ''
+    }
   }
+
+  function toggleStyle(style: string) {
+    flush()
+    const idx = stack.lastIndexOf(style)
+    if (idx !== -1) {
+      stack.splice(idx, 1)
+    } else {
+      stack.push(style)
+    }
+  }
+
+  while (i < line.length) {
+    // Link [text](url)
+    if (line[i] === '[') {
+      const cb = line.indexOf(']', i)
+      if (cb !== -1 && line[cb + 1] === '(') {
+        const cp = line.indexOf(')', cb + 2)
+        if (cp !== -1) {
+          flush()
+          inlines.push({
+            content: line.slice(i + 1, cb),
+            link: { url: line.slice(cb + 2, cp) },
+            text_element_style: {},
+          })
+          i = cp + 1
+          continue
+        }
+      }
+    }
+
+    // Inline code `...`
+    if (line[i] === '`') {
+      const end = line.indexOf('`', i + 1)
+      if (end !== -1) {
+        flush()
+        inlines.push({
+          content: line.slice(i + 1, end),
+          text_element_style: { inline_code: true },
+        })
+        i = end + 1
+        continue
+      }
+    }
+
+    // ~~strikethrough~~
+    if (line[i] === '~' && line[i + 1] === '~') {
+      toggleStyle('strike')
+      i += 2
+      continue
+    }
+
+    // Asterisk markers: *** (bold+italic), ** (bold), * (italic)
+    if (line[i] === '*') {
+      let count = 0
+      while (i + count < line.length && line[i + count] === '*') count++
+
+      if (count >= 3) {
+        toggleStyle('bold')
+        toggleStyle('italic')
+        i += 3
+        continue
+      }
+
+      if (count >= 2) {
+        toggleStyle('bold')
+        i += 2
+        continue
+      }
+
+      if (count === 1) {
+        toggleStyle('italic')
+        i += 1
+        continue
+      }
+    }
+
+    // Plain character
+    buf += line[i]
+    i++
+  }
+
+  flush()
 
   // If no matches, return the whole line as a single text element
   if (inlines.length === 0) {
@@ -331,7 +372,9 @@ export function markdownToFeishuBlocks(markdown: string): FeishuBlock[] {
         codeLines.push(lines[i])
         i++
       }
-      i++ // skip closing ```
+      if (i < lines.length && lines[i].trim().startsWith('```')) {
+        i++ // skip closing ```
+      }
       const codeText = codeLines.join('\n')
       blocks.push({
         block_type: 8,

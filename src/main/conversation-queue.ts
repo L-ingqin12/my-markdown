@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events'
 import crypto from 'crypto'
 
 export interface QueuedRequest {
@@ -9,11 +10,12 @@ export interface QueuedRequest {
   reject: (err: Error) => void
 }
 
-export class ConversationQueue {
+export class ConversationQueue extends EventEmitter {
   private queue: QueuedRequest[] = []
   private readonly maxQueueSize: number
 
   constructor(maxQueueSize: number = 10) {
+    super()
     this.maxQueueSize = maxQueueSize
   }
 
@@ -31,11 +33,16 @@ export class ConversationQueue {
         resolve,
         reject
       })
+      this.emit('queue-depth', this.queue.length)
     })
   }
 
   dequeue(): QueuedRequest | undefined {
-    return this.queue.shift()
+    const item = this.queue.shift()
+    if (item) {
+      this.emit('queue-depth', this.queue.length)
+    }
+    return item
   }
 
   get length(): number {
@@ -52,11 +59,27 @@ export class ConversationQueue {
 
   removeByConversationId(conversationId: string): number {
     const before = this.queue.length
-    this.queue = this.queue.filter(r => r.conversationId !== conversationId)
-    return before - this.queue.length
+    const removed: QueuedRequest[] = []
+    this.queue = this.queue.filter(r => {
+      if (r.conversationId !== conversationId) return true
+      removed.push(r)
+      return false
+    })
+    for (const item of removed) {
+      item.reject(new Error('Removed by conversation ID'))
+    }
+    const result = before - this.queue.length
+    if (result > 0) {
+      this.emit('queue-depth', this.queue.length)
+    }
+    return result
   }
 
   clear(): void {
+    for (const item of this.queue) {
+      item.reject(new Error('Queue cleared'))
+    }
     this.queue = []
+    this.emit('queue-depth', 0)
   }
 }

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useChatContext } from '../contexts/ChatContext'
-import type { ChatMessage } from '../../preload/index'
+import type { ChatMessage } from '../../shared/types'
 
 export interface UseAIChatReturn {
   sendMessage: (content: string) => Promise<void>

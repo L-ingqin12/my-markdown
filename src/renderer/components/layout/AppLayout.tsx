@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar'
 import { StatusBar } from './StatusBar'
 import { SearchPanel } from './SearchPanel'
 import { useEditor } from '../../contexts/EditorContext'
+import { useFileSystem } from '../../hooks/useFileSystem'
 import { useTheme } from '../../contexts/ThemeContext'
 import { KanbanView } from '../kanban/KanbanView'
 import { MindMapView } from '../graph/MindMapView'
@@ -20,6 +21,7 @@ import { ChatPanel } from '../chat/ChatPanel'
 export function AppLayout() {
   const ctx = useEditor()
   const themeCtx = useTheme()
+  const fs = useFileSystem()
   const [showAiSettings, setShowAiSettings] = useState(false)
 
   const editorContent = ctx.viewMode === 'kanban' ? (
@@ -30,7 +32,7 @@ export function AppLayout() {
     <KnowledgeGraph
       documents={[{ path: ctx.filePath || 'current.md', content: ctx.content }]}
       currentPath={ctx.filePath || undefined}
-      onNodeClick={() => {}}
+      onNodeClick={(path) => fs.openFileByPath(path)}
     />
   ) : !ctx.filePath && !ctx.content ? (
     <WelcomeScreen />

@@ -1,50 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react'
-
-interface Preferences {
-  fontSize: number
-  fontFamily: string
-  tabWidth: number
-  wordWrap: boolean
-  autoSave: boolean
-  autoSaveInterval: number
-  showLineNumbers: boolean
-  spellCheck: boolean
-}
-
-interface EditorContextValue {
-  content: string
-  setContent: (c: string) => void
-  filePath: string | null
-  setFilePath: (p: string | null) => void
-  fileName: string
-  setFileName: (n: string) => void
-  isModified: boolean
-  setIsModified: (m: boolean) => void
-  sourceMode: boolean
-  setSourceMode: (m: boolean) => void
-  focusMode: boolean
-  setFocusMode: (m: boolean) => void
-  typewriterMode: boolean
-  setTypewriterMode: (m: boolean) => void
-  sidebarVisible: boolean
-  setSidebarVisible: (v: boolean) => void
-  showSearch: boolean
-  setShowSearch: (s: boolean) => void
-  editorRef: React.MutableRefObject<EditorHandle | null>
-  preferences: Preferences
-  showThemeDialog: boolean
-  setShowThemeDialog: (v: boolean) => void
-  showAbout: boolean
-  setShowAbout: (v: boolean) => void
-  showPreferences: boolean
-  setShowPreferences: (v: boolean) => void
-  showUploadConfig: boolean
-  setShowUploadConfig: (v: boolean) => void
-  viewMode: 'editor' | 'kanban' | 'mindmap' | 'graph'
-  setViewMode: (mode: 'editor' | 'kanban' | 'mindmap' | 'graph') => void
-  cursorPos: { line: number; col: number }
-  setCursorPos: (pos: { line: number; col: number }) => void
-}
+import React, { createContext, useContext, useState, useRef, useMemo } from 'react'
+import type { Preferences } from '../../shared/types'
 
 export interface EditorHandle {
   focus: () => void
@@ -91,7 +46,23 @@ const defaultPreferences: Preferences = {
   spellCheck: false
 }
 
-export const EditorContext = createContext<EditorContextValue>({
+// ── EditorDataContext (high-frequency values: change on every keystroke) ──
+
+export interface EditorDataContextValue {
+  content: string
+  setContent: (c: string) => void
+  filePath: string | null
+  setFilePath: (p: string | null) => void
+  fileName: string
+  setFileName: (n: string) => void
+  isModified: boolean
+  setIsModified: (m: boolean) => void
+  cursorPos: { line: number; col: number }
+  setCursorPos: (pos: { line: number; col: number }) => void
+  editorRef: React.MutableRefObject<EditorHandle | null>
+}
+
+export const EditorDataContext = createContext<EditorDataContextValue>({
   content: '',
   setContent: () => {},
   filePath: null,
@@ -100,18 +71,81 @@ export const EditorContext = createContext<EditorContextValue>({
   setFileName: () => {},
   isModified: false,
   setIsModified: () => {},
+  cursorPos: { line: 1, col: 1 },
+  setCursorPos: () => {},
+  editorRef: { current: null }
+})
+
+export function EditorDataProvider({ children }: { children: React.ReactNode }) {
+  const [content, setContent] = useState('')
+  const [filePath, setFilePath] = useState<string | null>(null)
+  const [fileName, setFileName] = useState('Untitled')
+  const [isModified, setIsModified] = useState(false)
+  const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 })
+  const editorRef = useRef<EditorHandle | null>(null)
+
+  const value = useMemo(() => ({
+    content, setContent,
+    filePath, setFilePath,
+    fileName, setFileName,
+    isModified, setIsModified,
+    cursorPos, setCursorPos,
+    editorRef
+  }), [content, filePath, fileName, isModified, cursorPos])
+
+  return (
+    <EditorDataContext.Provider value={value}>
+      {children}
+    </EditorDataContext.Provider>
+  )
+}
+
+export function useEditorData() {
+  return useContext(EditorDataContext)
+}
+
+// ── EditorUIContext (low-frequency UI state) ──
+
+export interface EditorUIContextValue {
+  sourceMode: boolean
+  setSourceMode: (m: boolean) => void
+  focusMode: boolean
+  setFocusMode: (m: boolean) => void
+  typewriterMode: boolean
+  setTypewriterMode: (m: boolean) => void
+  sidebarVisible: boolean
+  setSidebarVisible: (v: boolean) => void
+  showSearch: boolean
+  setShowSearch: (s: boolean) => void
+  viewMode: 'editor' | 'kanban' | 'mindmap' | 'graph'
+  setViewMode: (mode: 'editor' | 'kanban' | 'mindmap' | 'graph') => void
+  showThemeDialog: boolean
+  setShowThemeDialog: (v: boolean) => void
+  showAbout: boolean
+  setShowAbout: (v: boolean) => void
+  showExportResult: boolean
+  setShowExportResult: (v: boolean) => void
+  showPreferences: boolean
+  setShowPreferences: (v: boolean) => void
+  showUploadConfig: boolean
+  setShowUploadConfig: (v: boolean) => void
+  preferences: Preferences
+  setPreferences: (p: Preferences) => void
+}
+
+export const EditorUIContext = createContext<EditorUIContextValue>({
   sourceMode: false,
   setSourceMode: () => {},
   focusMode: false,
   setFocusMode: () => {},
   typewriterMode: false,
   setTypewriterMode: () => {},
-  sidebarVisible: false,
+  sidebarVisible: true,
   setSidebarVisible: () => {},
   showSearch: false,
   setShowSearch: () => {},
-  editorRef: { current: null },
-  preferences: defaultPreferences,
+  viewMode: 'editor',
+  setViewMode: () => {},
   showThemeDialog: false,
   setShowThemeDialog: () => {},
   showAbout: false,
@@ -122,17 +156,11 @@ export const EditorContext = createContext<EditorContextValue>({
   setShowPreferences: () => {},
   showUploadConfig: false,
   setShowUploadConfig: () => {},
-  viewMode: 'editor',
-  setViewMode: () => {},
-  cursorPos: { line: 1, col: 1 },
-  setCursorPos: () => {}
+  preferences: defaultPreferences,
+  setPreferences: () => {}
 })
 
-export function EditorProvider({ children }: { children: React.ReactNode }) {
-  const [content, setContent] = useState('')
-  const [filePath, setFilePath] = useState<string | null>(null)
-  const [fileName, setFileName] = useState('Untitled')
-  const [isModified, setIsModified] = useState(false)
+export function EditorUIContextProvider({ children }: { children: React.ReactNode }) {
   const [sourceMode, setSourceMode] = useState(false)
   const [focusMode, setFocusMode] = useState(false)
   const [typewriterMode, setTypewriterMode] = useState(false)
@@ -145,8 +173,6 @@ export function EditorProvider({ children }: { children: React.ReactNode }) {
   const [showExportResult, setShowExportResult] = useState(false)
   const [showPreferences, setShowPreferences] = useState(false)
   const [showUploadConfig, setShowUploadConfig] = useState(false)
-  const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 })
-  const editorRef = useRef<EditorHandle | null>(null)
 
   React.useEffect(() => {
     window.api.getPreferences().then(p => {
@@ -154,31 +180,53 @@ export function EditorProvider({ children }: { children: React.ReactNode }) {
     }).catch(() => {})
   }, [])
 
+  const value = useMemo(() => ({
+    sourceMode, setSourceMode,
+    focusMode, setFocusMode,
+    typewriterMode, setTypewriterMode,
+    sidebarVisible, setSidebarVisible,
+    showSearch, setShowSearch,
+    viewMode, setViewMode,
+    showThemeDialog, setShowThemeDialog,
+    showAbout, setShowAbout,
+    showExportResult, setShowExportResult,
+    showPreferences, setShowPreferences,
+    showUploadConfig, setShowUploadConfig,
+    preferences, setPreferences
+  }), [
+    sourceMode, focusMode, typewriterMode,
+    sidebarVisible, showSearch, viewMode,
+    showThemeDialog, showAbout, showExportResult,
+    showPreferences, showUploadConfig, preferences
+  ])
+
   return (
-    <EditorContext.Provider value={{
-      content, setContent,
-      filePath, setFilePath,
-      fileName, setFileName,
-      isModified, setIsModified,
-      sourceMode, setSourceMode,
-      focusMode, setFocusMode,
-      typewriterMode, setTypewriterMode,
-      sidebarVisible, setSidebarVisible,
-      showSearch, setShowSearch,
-      editorRef, preferences,
-      viewMode, setViewMode,
-      showThemeDialog, setShowThemeDialog,
-      showAbout, setShowAbout,
-      showExportResult, setShowExportResult,
-      showPreferences, setShowPreferences,
-      showUploadConfig, setShowUploadConfig,
-      cursorPos, setCursorPos
-    }}>
+    <EditorUIContext.Provider value={value}>
       {children}
-    </EditorContext.Provider>
+    </EditorUIContext.Provider>
   )
 }
 
-export function useEditor() {
-  return useContext(EditorContext)
+export function useEditorUI() {
+  return useContext(EditorUIContext)
+}
+
+// ── Combined provider ──
+
+export function EditorProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <EditorDataProvider>
+      <EditorUIContextProvider>
+        {children}
+      </EditorUIContextProvider>
+    </EditorDataProvider>
+  )
+}
+
+// ── Convenience hook (returns everything from both contexts) ──
+
+export type EditorContextValue = EditorDataContextValue & EditorUIContextValue
+
+export function useEditor(): EditorContextValue {
+  return { ...useEditorData(), ...useEditorUI() }
 }

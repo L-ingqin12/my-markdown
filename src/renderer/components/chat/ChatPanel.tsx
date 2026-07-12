@@ -206,9 +206,9 @@ export function ChatPanel() {
           </div>
         )}
 
-        {ctx.messages.map((msg, idx) => (
+        {ctx.messages.map((msg) => (
           <ChatMessage
-            key={idx}
+            key={msg.id}
             message={msg}
             onInsertToDoc={handleInsertToDoc}
             onInsertConversation={handleInsertConversation}
@@ -219,7 +219,8 @@ export function ChatPanel() {
         {/* Streaming message */}
         {ctx.isStreaming && ctx.streamingContent && (
           <ChatMessage
-            message={{ role: 'assistant', content: ctx.streamingContent }}
+            key="streaming"
+            message={{ id: 'streaming', role: 'assistant', content: ctx.streamingContent }}
             isStreaming
             onInsertToDoc={handleInsertToDoc}
             onInsertConversation={handleInsertConversation}

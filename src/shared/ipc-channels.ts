@@ -11,6 +11,7 @@ export const IPC = {
 
   // Image upload
   IMAGE_UPLOAD: 'image:upload',
+  // main-process only (triggered by menu); no preload wrapper
   IMAGE_UPLOAD_ALL: 'image:upload-all',
   IMAGE_GET_CONFIG: 'image:get-config',
   IMAGE_SET_CONFIG: 'image:set-config',
@@ -41,9 +42,6 @@ export const IPC = {
   EXPORT_PDF: 'export:pdf',
   EXPORT_FEISHU: 'export:feishu',
   EXPORT_DOC: 'export:doc',
-
-  // Dialog
-  DIALOG_CONFIRM: 'dialog:confirm',
 
   // AI Chat
   AI_CHAT_SEND: 'ai:chat-send',

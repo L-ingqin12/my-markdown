@@ -1,81 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC } from '../shared/ipc-channels'
-
-export interface FileResult {
-  content: string
-  filePath: string
-  fileName: string
-}
-
-export interface UploadConfig {
-  service: string
-  customCommand?: string
-  smmsToken?: string
-  githubRepo?: string
-  githubToken?: string
-  githubBranch?: string
-  githubPath?: string
-}
-
-export interface ThemeInfo {
-  name: string
-  displayName: string
-  isBuiltin: boolean
-}
-
-export interface Preferences {
-  fontSize: number
-  fontFamily: string
-  tabWidth: number
-  wordWrap: boolean
-  autoSave: boolean
-  autoSaveInterval: number
-  showLineNumbers: boolean
-  spellCheck: boolean
-}
-
-// AI types
-export interface AIProviderConfig {
-  id: string
-  name: string
-  type: 'anthropic' | 'openai' | 'custom'
-  apiKey: string
-  baseUrl: string
-  model: string
-  isActive: boolean
-}
-
-export interface ConversationMeta {
-  id: string
-  title: string
-  created: string
-  updated: string
-  provider: string
-  model: string
-  messageCount: number
-}
-
-export interface ChatMessage {
-  role: 'user' | 'assistant'
-  content: string
-}
-
-export interface AiChunkData {
-  chunk: string
-  conversationId: string
-}
-
-export interface AiDoneData {
-  conversationId: string
-  content: string
-  title?: string
-  stopped?: boolean
-}
-
-export interface AiErrorData {
-  conversationId: string
-  error: string
-}
+import type { FileResult, UploadConfig, ThemeInfo, Preferences, AIProviderConfig, ConversationMeta, ChatMessage, AiChunkData, AiDoneData, AiErrorData, ClaudeInstanceInfo, ClaudeExitInfo, ClaudeSystemStatus } from '../shared/types'
 
 const api = {
   // File operations
@@ -184,7 +109,7 @@ const api = {
     ipcRenderer.invoke(IPC.CLAUDE_KILL, instanceId),
   claudeKillAll: (): Promise<void> =>
     ipcRenderer.invoke(IPC.CLAUDE_KILL_ALL),
-  claudeList: (): Promise<any[]> =>
+  claudeList: (): Promise<ClaudeInstanceInfo[]> =>
     ipcRenderer.invoke(IPC.CLAUDE_LIST),
   onClaudeOutput: (callback: (instanceId: string, text: string) => void): (() => void) => {
     const handler = (_e: Electron.IpcRendererEvent, instanceId: string, text: string) => callback(instanceId, text)
@@ -196,13 +121,13 @@ const api = {
     ipcRenderer.on(IPC.CLAUDE_ERROR_OUTPUT, handler)
     return () => { ipcRenderer.removeListener(IPC.CLAUDE_ERROR_OUTPUT, handler) }
   },
-  onClaudeExited: (callback: (instanceId: string, info: any) => void): (() => void) => {
-    const handler = (_e: Electron.IpcRendererEvent, instanceId: string, info: any) => callback(instanceId, info)
+  onClaudeExited: (callback: (instanceId: string, info: ClaudeExitInfo) => void): (() => void) => {
+    const handler = (_e: Electron.IpcRendererEvent, instanceId: string, info: ClaudeExitInfo) => callback(instanceId, info)
     ipcRenderer.on(IPC.CLAUDE_EXITED, handler)
     return () => { ipcRenderer.removeListener(IPC.CLAUDE_EXITED, handler) }
   },
-  onClaudeSystemStatus: (callback: (status: any) => void): (() => void) => {
-    const handler = (_e: Electron.IpcRendererEvent, status: any) => callback(status)
+  onClaudeSystemStatus: (callback: (status: ClaudeSystemStatus) => void): (() => void) => {
+    const handler = (_e: Electron.IpcRendererEvent, status: ClaudeSystemStatus) => callback(status)
     ipcRenderer.on(IPC.CLAUDE_SYSTEM_STATUS, handler)
     return () => { ipcRenderer.removeListener(IPC.CLAUDE_SYSTEM_STATUS, handler) }
   },

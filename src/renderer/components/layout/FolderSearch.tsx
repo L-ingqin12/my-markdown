@@ -7,7 +7,11 @@ interface SearchResult {
   content: string
 }
 
-export function FolderSearch() {
+interface FolderSearchProps {
+  onFileOpen?: (path: string) => void
+}
+
+export function FolderSearch({ onFileOpen }: FolderSearchProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [searching, setSearching] = useState(false)
@@ -48,15 +52,6 @@ export function FolderSearch() {
     setSearching(false)
   }, [query, files])
 
-  const handleResultClick = async (filePath: string) => {
-    const result = await window.api.readFile(filePath)
-    if (result) {
-      // Use the editor to open
-      const { useEditor } = require('../../contexts/EditorContext')
-      // Will be handled by parent via callback
-    }
-  }
-
   return (
     <div className="folder-search">
       <div className="folder-search-input">
@@ -85,10 +80,7 @@ export function FolderSearch() {
                   if (res) {
                     window.api.setTitle(`My Markdown - ${r.fileName}`)
                     window.api.addRecentFile(r.filePath)
-                    // Signal to parent that a file was selected
-                    document.dispatchEvent(new CustomEvent('file-open', {
-                      detail: { path: r.filePath, content: res.content, fileName: r.fileName }
-                    }))
+                    onFileOpen?.(r.filePath)
                   }
                 })
               }}

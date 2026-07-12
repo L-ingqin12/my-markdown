@@ -5,6 +5,7 @@ import { FileInfo } from './FileInfo'
 import { FolderSearch } from './FolderSearch'
 import { TagPanel } from './TagPanel'
 import { useEditor } from '../../contexts/EditorContext'
+import { useFileSystem } from '../../hooks/useFileSystem'
 import { extractTags } from '../../utils/wikilink'
 
 interface SidebarProps {
@@ -20,6 +21,7 @@ type TabId = 'files' | 'search' | 'outline' | 'tags' | 'settings'
 export function Sidebar({ content, visible, onUploadConfig, onPreferences, onAiSettings }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabId>('files')
   const ctx = useEditor()
+  const { openFileByPath } = useFileSystem()
 
   const tabs: { id: TabId; label: string; icon: string }[] = [
     { id: 'files', label: 'Files', icon: '📁' },
@@ -29,16 +31,7 @@ export function Sidebar({ content, visible, onUploadConfig, onPreferences, onAiS
     { id: 'settings', label: 'Settings', icon: '⚙' }
   ]
 
-  const handleFileClick = async (path: string) => {
-    const result = await window.api.readFile(path)
-    if (result) {
-      ctx.setContent(result.content)
-      ctx.setFilePath(result.filePath)
-      ctx.setFileName(result.fileName)
-      ctx.setIsModified(false)
-      window.api.setTitle(`My Markdown - ${result.fileName}`)
-    }
-  }
+  const handleFileClick = openFileByPath
 
   return (
     <div className={`app-sidebar ${!visible ? 'hidden' : ''}`}>
@@ -70,7 +63,7 @@ export function Sidebar({ content, visible, onUploadConfig, onPreferences, onAiS
         )}
 
         {activeTab === 'search' && (
-          <FolderSearch />
+          <FolderSearch onFileOpen={handleFileClick} />
         )}
 
         {activeTab === 'outline' && (

@@ -1,12 +1,14 @@
 import LZString from 'lz-string'
+import type { ExcalidrawElement } from '@excalidraw/excalidraw/element/types'
+import type { AppState, BinaryFiles } from '@excalidraw/excalidraw/types'
 
 export interface ExcalidrawScene {
   type: 'excalidraw'
   version: number
   source: string
-  elements: any[]
-  appState: Record<string, any>
-  files: Record<string, any>
+  elements: ExcalidrawElement[]
+  appState: AppState
+  files: BinaryFiles
 }
 
 export function parseExcalidrawBlocks(content: string): Map<string, ExcalidrawScene> {

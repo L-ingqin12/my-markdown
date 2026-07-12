@@ -41,8 +41,9 @@ export function UploadConfig({ onClose }: UploadConfigProps) {
       await window.api.setUploadConfig(config)
       const ok = await window.api.testUpload()
       setTestResult(ok ? 'Upload test passed!' : 'Upload test failed')
-    } catch (err: any) {
-      setTestResult(`Error: ${err.message}`)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      setTestResult(`Error: ${message}`)
     } finally {
       setTesting(false)
     }

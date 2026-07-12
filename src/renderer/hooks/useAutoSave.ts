@@ -10,8 +10,10 @@ export function useAutoSave(content: string, filePath: string | null, isModified
     if (content === lastSavedContent.current) return
 
     const timer = setTimeout(async () => {
-      lastSavedContent.current = content
-      await saveFile()
+      const ok = await saveFile()
+      if (ok) {
+        lastSavedContent.current = content
+      }
     }, interval)
 
     return () => clearTimeout(timer)

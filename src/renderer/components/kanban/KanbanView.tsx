@@ -63,54 +63,38 @@ export function KanbanView() {
 
   const toggleCard = useCallback((cardId: string) => {
     if (!board) return
-    const updated: KanbanBoard = JSON.parse(JSON.stringify(board))
-    for (const col of updated.columns) {
-      const card = col.cards.find((c) => c.id === cardId)
-      if (card) {
-        card.checked = !card.checked
-        break
-      }
-    }
-    // Also check archived
-    const archived = updated.archivedCards.find((c) => c.id === cardId)
-    if (archived) {
-      archived.checked = !archived.checked
-    }
-    saveBoard(updated)
+    saveBoard({
+      ...board,
+      columns: board.columns.map(col => ({
+        ...col,
+        cards: col.cards.map(c => c.id === cardId ? { ...c, checked: !c.checked } : c)
+      })),
+      archivedCards: board.archivedCards.map(c => c.id === cardId ? { ...c, checked: !c.checked } : c)
+    })
   }, [board, saveBoard])
 
   const editCard = useCallback((cardId: string, newTitle: string) => {
     if (!board) return
-    const updated: KanbanBoard = JSON.parse(JSON.stringify(board))
-    for (const col of updated.columns) {
-      const card = col.cards.find((c) => c.id === cardId)
-      if (card) {
-        card.title = newTitle
-        break
-      }
-    }
-    const archived = updated.archivedCards.find((c) => c.id === cardId)
-    if (archived) {
-      archived.title = newTitle
-    }
-    saveBoard(updated)
+    saveBoard({
+      ...board,
+      columns: board.columns.map(col => ({
+        ...col,
+        cards: col.cards.map(c => c.id === cardId ? { ...c, title: newTitle } : c)
+      })),
+      archivedCards: board.archivedCards.map(c => c.id === cardId ? { ...c, title: newTitle } : c)
+    })
   }, [board, saveBoard])
 
   const deleteCard = useCallback((cardId: string) => {
     if (!board) return
-    const updated: KanbanBoard = JSON.parse(JSON.stringify(board))
-    for (const col of updated.columns) {
-      const idx = col.cards.findIndex((c) => c.id === cardId)
-      if (idx >= 0) {
-        col.cards.splice(idx, 1)
-        break
-      }
-    }
-    const archIdx = updated.archivedCards.findIndex((c) => c.id === cardId)
-    if (archIdx >= 0) {
-      updated.archivedCards.splice(archIdx, 1)
-    }
-    saveBoard(updated)
+    saveBoard({
+      ...board,
+      columns: board.columns.map(col => ({
+        ...col,
+        cards: col.cards.filter(c => c.id !== cardId)
+      })),
+      archivedCards: board.archivedCards.filter(c => c.id !== cardId)
+    })
   }, [board, saveBoard])
 
   // --- Column operations ---
@@ -119,49 +103,44 @@ export function KanbanView() {
     if (!board) return
     const trimmed = title.trim()
     if (!trimmed) return
-    const updated: KanbanBoard = JSON.parse(JSON.stringify(board))
-    updated.columns.push({
-      id: uuidv4(),
-      title: trimmed,
-      isComplete: false,
-      cards: [],
+    saveBoard({
+      ...board,
+      columns: [...board.columns, {
+        id: uuidv4(),
+        title: trimmed,
+        isComplete: false,
+        cards: [],
+      }]
     })
-    saveBoard(updated)
     setAddingColumn(false)
     setNewColumnTitle('')
   }, [board, saveBoard])
 
   const renameColumn = useCallback((columnId: string, newTitle: string) => {
     if (!board) return
-    const updated: KanbanBoard = JSON.parse(JSON.stringify(board))
-    const col = updated.columns.find((c) => c.id === columnId)
-    if (col) {
-      col.title = newTitle
-      saveBoard(updated)
-    }
+    saveBoard({
+      ...board,
+      columns: board.columns.map(c => c.id === columnId ? { ...c, title: newTitle } : c)
+    })
   }, [board, saveBoard])
 
   const deleteColumn = useCallback((columnId: string) => {
     if (!board) return
-    const updated: KanbanBoard = JSON.parse(JSON.stringify(board))
-    updated.columns = updated.columns.filter((c) => c.id !== columnId)
-    saveBoard(updated)
+    saveBoard({
+      ...board,
+      columns: board.columns.filter(c => c.id !== columnId)
+    })
   }, [board, saveBoard])
 
   const addCardToColumn = useCallback((columnId: string, title: string) => {
     if (!board) return
-    const updated: KanbanBoard = JSON.parse(JSON.stringify(board))
-    const col = updated.columns.find((c) => c.id === columnId)
-    if (col) {
-      col.cards.push({
-        id: uuidv4(),
-        title,
-        checked: false,
-        tags: [],
-        metadata: {},
-      })
-      saveBoard(updated)
-    }
+    saveBoard({
+      ...board,
+      columns: board.columns.map(c => c.id === columnId
+        ? { ...c, cards: [...c.cards, { id: uuidv4(), title, checked: false, tags: [], metadata: {} }] }
+        : c
+      )
+    })
   }, [board, saveBoard])
 
   // --- Drag handlers ---
@@ -170,7 +149,6 @@ export function KanbanView() {
     const { active } = event
     const activeId = active.id as string
 
-    // Find the card being dragged
     if (!board) return
     for (const col of board.columns) {
       const card = col.cards.find((c) => c.id === activeId)
@@ -179,15 +157,13 @@ export function KanbanView() {
         return
       }
     }
-    // Check archived
     const archived = board.archivedCards.find((c) => c.id === activeId)
     if (archived) {
       setActiveCard(archived)
     }
   }, [board])
 
-  const handleDragOver = useCallback((event: DragOverEvent) => {
-    // We handle reordering in dragEnd to avoid intermediate state issues
+  const handleDragOver = useCallback((_event: DragOverEvent) => {
   }, [])
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -198,10 +174,8 @@ export function KanbanView() {
     const activeId = active.id as string
     const overId = over.id as string
 
-    // If dropped on itself, noop
     if (activeId === overId) return
 
-    // Find source column (where the card is from)
     let sourceColIdx = -1
     let cardIdx = -1
     for (let ci = 0; ci < board.columns.length; ci++) {
@@ -214,28 +188,29 @@ export function KanbanView() {
       }
     }
 
-    if (sourceColIdx < 0) return // Card not found (maybe archived, don't allow drag)
+    if (sourceColIdx < 0) return
 
-    const updated: KanbanBoard = JSON.parse(JSON.stringify(board))
-    const sourceCol = updated.columns[sourceColIdx]
+    const sourceCol = board.columns[sourceColIdx]
     const card = sourceCol.cards[cardIdx]
 
-    // Determine destination
-    // Check if over is a column ID
-    const destColIdx = updated.columns.findIndex((c) => c.id === overId)
+    // Build columns with card removed from source
+    let newColumns = board.columns.map((col, ci) =>
+      ci === sourceColIdx ? { ...col, cards: col.cards.filter((_, i) => i !== cardIdx) } : col
+    )
+
+    const destColIdx = newColumns.findIndex((c) => c.id === overId)
 
     if (destColIdx >= 0) {
       // Dropped on a column itself (empty area)
-      // Remove from source, add to destination at end
-      sourceCol.cards.splice(cardIdx, 1)
-      updated.columns[destColIdx].cards.push(card)
+      newColumns = newColumns.map((col, ci) =>
+        ci === destColIdx ? { ...col, cards: [...col.cards, card] } : col
+      )
     } else {
-      // Dropped on a card - find which column that card belongs to
+      // Dropped on a card
       let destCardColIdx = -1
       let destCardIdx = -1
-      for (let ci = 0; ci < updated.columns.length; ci++) {
-        const col = updated.columns[ci]
-        const ci2 = col.cards.findIndex((c) => c.id === overId)
+      for (let ci = 0; ci < newColumns.length; ci++) {
+        const ci2 = newColumns[ci].cards.findIndex((c) => c.id === overId)
         if (ci2 >= 0) {
           destCardColIdx = ci
           destCardIdx = ci2
@@ -247,22 +222,22 @@ export function KanbanView() {
 
       if (sourceColIdx === destCardColIdx) {
         // Reorder within the same column
-        sourceCol.cards = arrayMove(sourceCol.cards, cardIdx, destCardIdx)
+        const colCards = arrayMove(newColumns[sourceColIdx].cards, cardIdx, destCardIdx)
+        newColumns = newColumns.map((col, ci) => ci === sourceColIdx ? { ...col, cards: colCards } : col)
       } else {
         // Move between columns
-        sourceCol.cards.splice(cardIdx, 1)
-        // If the card was before the destination card in the source column,
-        // the destCardIdx might need adjustment
-        const adjustedDestIdx = updated.columns[destCardColIdx].cards.findIndex((c) => c.id === overId)
-        if (adjustedDestIdx >= 0) {
-          updated.columns[destCardColIdx].cards.splice(adjustedDestIdx, 0, card)
-        } else {
-          updated.columns[destCardColIdx].cards.push(card)
-        }
+        newColumns = newColumns.map((col, ci) => {
+          if (ci === destCardColIdx) {
+            const cards = [...col.cards]
+            cards.splice(destCardIdx, 0, card)
+            return { ...col, cards }
+          }
+          return col
+        })
       }
     }
 
-    saveBoard(updated)
+    saveBoard({ ...board, columns: newColumns })
   }, [board, saveBoard])
 
   if (!board) {

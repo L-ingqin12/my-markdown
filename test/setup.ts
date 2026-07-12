@@ -48,7 +48,22 @@ const mockApi = {
   onClaudeError: () => () => {},
   onClaudeExited: () => () => {},
   onClaudeSystemStatus: () => () => {},
-  onClaudeQueueStatus: () => () => {}
+  onClaudeQueueStatus: () => () => {},
+  // Folder
+  openFolder: async () => null,
+  scanFolder: async () => [],
+  // Export
+  exportFeishu: async () => null,
+  exportDoc: async () => null,
+  // Git
+  gitStatus: async () => null,
+  gitCommit: async () => true,
+  gitCommitAll: async () => true,
+  gitPush: async () => true,
+  gitPull: async () => true,
+  gitLog: async () => [],
+  gitInit: async () => true,
+  gitDiff: async () => ''
 }
 
 if (typeof window !== 'undefined') {

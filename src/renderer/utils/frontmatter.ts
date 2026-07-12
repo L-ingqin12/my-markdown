@@ -109,7 +109,8 @@ function parseYamlLines(raw: string): FrontmatterData {
   const lines = raw.split('\n')
   const stack: { obj: FrontmatterData; indent: number }[] = [{ obj: result, indent: -1 }]
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
     const trimmed = line.trimEnd()
     if (trimmed.trim() === '' || trimmed.trim().startsWith('#')) continue
 
@@ -151,11 +152,25 @@ function parseYamlLines(raw: string): FrontmatterData {
       const valueStr = kvMatch[2].trim()
       const current = stack[stack.length - 1].obj
 
-      if (valueStr === '' || valueStr === '|' || valueStr === '>') {
-        // Nested object or block – push a new sub‑object
+      if (valueStr === '') {
+        // Nested object – push a new sub‑object
         const sub: FrontmatterData = {}
         current[key] = sub
         stack.push({ obj: sub, indent })
+      } else if (valueStr === '|' || valueStr === '>') {
+        // Block scalar – collect subsequent indented lines
+        const blockLines: string[] = []
+        const keyIndent = indent
+        i++
+        while (i < lines.length) {
+          const nextLine = lines[i]
+          const nextIndent = nextLine.length - nextLine.trimStart().length
+          if (nextLine.trim() !== '' && nextIndent <= keyIndent) break
+          blockLines.push(nextLine.trimStart())
+          i++
+        }
+        i--
+        current[key] = blockLines.join(valueStr === '|' ? '\n' : ' ')
       } else if (valueStr.startsWith('"') && valueStr.endsWith('"')) {
         current[key] = valueStr.slice(1, -1)
       } else if (valueStr.startsWith("'") && valueStr.endsWith("'")) {
